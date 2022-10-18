@@ -1,1 +1,1 @@
-add_library(Common BaseApplication.cpp main.cpp GraohicsManager.cpp)
+add_library(Common BaseApplication.cpp main.cpp)
