@@ -13,3 +13,6 @@ _deps
 build
 out
 .cache
+*.vcxproj
+*.vcxproj.filters
+*.sln
