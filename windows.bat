@@ -1,1 +1,1 @@
-cmake -G Visual Studio 17
+cmake -G "Visual Studio 17" -B "ZetaEngine-build/"
