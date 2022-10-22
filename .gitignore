@@ -16,3 +16,4 @@ out
 *.vcxproj
 *.vcxproj.filters
 *.sln
+CMakeSettings.json
