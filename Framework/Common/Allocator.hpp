@@ -26,6 +26,7 @@ namespace ZetaEngine
 		static const uint8_t PATTERN_ALLOC = 0xFD;
 		static const uint8_t PATTERN_FREE = 0xFE;
 
+		Allocator() = default;
 		Allocator(size_t data_size, size_t page_size, size_t alignment);
 		~Allocator();
 
