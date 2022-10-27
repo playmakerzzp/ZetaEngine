@@ -7,7 +7,7 @@ namespace ZetaEngine
     class BaseApplication : implements IApplication
     {
     public:
-        BaseApplication(GfxConfiguration& cfg);
+        explicit BaseApplication(GfxConfiguration& cfg);
         BaseApplication() = delete;
         virtual int Initialize() override;
         virtual void Finalize() override;
@@ -15,6 +15,8 @@ namespace ZetaEngine
         virtual void Tick() override;
 
         virtual bool IsQuit() override;
+
+        inline GfxConfiguration& GetConfiguration() { return m_Config; };
 
     protected:
         // Flag if need quit the main loop of the application

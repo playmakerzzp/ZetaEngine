@@ -10,8 +10,11 @@ ZetaEngine::BaseApplication::BaseApplication(GfxConfiguration& cfg)
 }
 int ZetaEngine::BaseApplication::Initialize()
 {
+    int result = 0;
+
     std::cout << m_Config;
-    return 0;
+
+    return result;
 }
 
 void ZetaEngine::BaseApplication::Finalize()

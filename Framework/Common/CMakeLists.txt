@@ -1,1 +1,7 @@
-add_library(Common BaseApplication.cpp main.cpp GraohicsManager.cpp Allocator.cpp MemoryManager.cpp "WindowsApplication.cpp")
+add_library(Common
+Allocator.cpp
+BaseApplication.cpp
+GraphicsManager.cpp
+MemoryManager.cpp
+main.cpp
+)
