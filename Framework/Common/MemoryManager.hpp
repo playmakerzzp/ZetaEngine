@@ -21,13 +21,14 @@ namespace ZetaEngine {
         }
 
     public:
-        virtual ~MemoryManager() {}
+        virtual ~MemoryManager() = default;
 
         virtual int Initialize();
         virtual void Finalize();
         virtual void Tick();
 
         void* Allocate(size_t size);
+        void* Allocate(size_t size, size_t alignment);
         void  Free(void* p, size_t size);
     private:
         static size_t*        m_pBlockSizeLookup;
