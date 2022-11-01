@@ -67,7 +67,7 @@ namespace ZetaEngine {
         operator const float*() const { return static_cast<const float*>(data); };
     };
     
-    typedef Vector2Type<float> Vector2f;
+    using Vector2f = Vector2Type<float>;
 
     template <typename T>
     struct Vector3Type
@@ -98,7 +98,7 @@ namespace ZetaEngine {
         operator const float*() const { return static_cast<const float*>(data); };
     };
 
-    typedef Vector3Type<float> Vector3f;
+    using Vector3f = Vector3Type<float>;
 
     template <typename T>
     struct Vector4Type
@@ -124,7 +124,9 @@ namespace ZetaEngine {
         operator const float*() const { return static_cast<const float*>(data); };
     };
 
-    typedef Vector4Type<float> Vector4f;
+    using Vector4f = Vector4Type<float>;
+    using R8G8B8A8Unorm = Vector4Type<uint8_t>;
+    using Vector4i = Vector4Type<uint8_t>;
 
     template <template <typename> class TT, typename T>
     std::ostream& operator<<(std::ostream& out, TT<T> vector)
