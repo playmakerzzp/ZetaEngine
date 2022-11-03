@@ -179,9 +179,10 @@ MESSAGE( STATUS "CMAKE_RANLIB: " ${CMAKE_RANLIB} )
 # ------------------------- End of Generic CMake Variable Logging ------------------
 
 project (ZetaEngine)
+include_directories("${PROJECT_SOURCE_DIR}/Framework/Codec")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Common")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Interface")
-include_directories("${PROJECT_SOURCE_DIR}/Framework/GeomMath")
+include_directories("${PROJECT_SOURCE_DIR}/Framework/GeoMath")
 include_directories("${PROJECT_SOURCE_DIR}/RHI")
 IF(${UNIX})
     include_directories("${PROJECT_SOURCE_DIR}/Platform/Linux")
