@@ -7,31 +7,27 @@
 #include "IRuntimeModule.hpp"
 #include "Buffer.hpp"
 
-namespace ZetaEngine
-{
-    class AssetLoader : public IRuntimeModule
-    {
+namespace ZetaEngine {
+	class AssetLoader : public IRuntimeModule {
     public:
-        virtual ~AssetLoader() override = default;
+        virtual ~AssetLoader() {};
 
         virtual int Initialize() override;
         virtual void Finalize() override;
 
         virtual void Tick() override;
 
-        using AssetFilePtr = void*;
+        typedef void* AssetFilePtr;
 
-        enum AssetOpenMode
-        {
-            MY_OPEN_TEXT = 0,   // Open In Text Mode
-            My_OPEN_BINARY = 1, // Open In Binary Mode
+        enum AssetOpenMode {
+            MY_OPEN_TEXT   = 0, /// Open In Text Mode
+            MY_OPEN_BINARY = 1, /// Open In Binary Mode 
         };
 
-        enum AssetSeekBase
-        {
-            MY_SEEK_SET = 0, // SEEK_SET
-            MY_SEEK_CUR = 1, // SEEK_CUR
-            MY_SEEK_END = 2, // SEEK_END
+        enum AssetSeekBase {
+            MY_SEEK_SET = 0, /// SEEK_SET
+            MY_SEEK_CUR = 1, /// SEEK_CUR
+            MY_SEEK_END = 2  /// SEEK_END
         };
 
         bool AddSearchPath(const char *path);
@@ -41,8 +37,10 @@ namespace ZetaEngine
         bool FileExists(const char *filePath);
 
         AssetFilePtr OpenFile(const char* name, AssetOpenMode mode);
-        
-        Buffer SyncOpenAndReadText(const char* filePath);
+
+        Buffer SyncOpenAndReadText(const char *filePath);
+
+        Buffer SyncOpenAndReadBinary(const char *filePath);
 
         size_t SyncRead(const AssetFilePtr& fp, Buffer& buf);
 
@@ -52,10 +50,10 @@ namespace ZetaEngine
 
         int32_t Seek(AssetFilePtr fp, long offset, AssetSeekBase where);
 
-        inline std::string SyncOpenAndReadTextFileToString(const char* filename)
+        inline std::string SyncOpenAndReadTextFileToString(const char* fileName)
         {
             std::string result;
-            Buffer buffer = SyncOpenAndReadText(filename);
+            Buffer buffer = SyncOpenAndReadText(fileName);
             char* content = reinterpret_cast<char*>(buffer.m_pData);
 
             if (content)
@@ -67,5 +65,6 @@ namespace ZetaEngine
         }
     private:
         std::vector<std::string> m_strSearchPath;
-    };
+	};
 }
+
