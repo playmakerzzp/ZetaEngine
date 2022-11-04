@@ -1,22 +1,3 @@
-#ifndef __STDCBUFFER_H__
-#define __STDCBUFFER_H__
-
-struct a2v
-{
-	float3 Position		: POSITION;
-	float3 Normal		: NORMAL;
-	float4 Tangent		: TANGENT;
-	float2 TextureUV	: TEXCOORD;
-};
-
-cbuffer Constants : register(b0)
-{
-	float4x4 m_modelView;
-	float4x4 m_modelViewProjection;
-	float4   m_lightPosition;
-	float4   m_lightColor;
-	float4   m_ambientColor;
-	float4   m_lightAttenuation;
-};
-
-#endif // !__STDCBUFFER_H__
+version https://git-lfs.github.com/spec/v1
+oid sha256:41d7eb78465f22d01624f9623a7bbd2d79f6edddb8c07042898e2a8790a257b1
+size 434
