@@ -17,5 +17,10 @@ namespace ZetaEngine
         T *t;
     };
 
-    using 
+    using SceneEmptyNode = BaseSceneNode;
+    using SceneGeometryNode = SceneNode<SceneObjectMesh>;
+    using SceneMaterialNode = SceneNode<SceneObjectMaterial>;
+    using SceneLightNode = SceneNode<SceneObjectLight>;
+    using SceneCameraNode = SceneNode<SceneObjectCamera>;
+
 }
