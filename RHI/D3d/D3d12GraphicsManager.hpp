@@ -22,7 +22,7 @@ namespace ZetaEngine
 		static const uint32_t		kFrameCount = 2;
 		ID3D12Device*				m_pDev = nullptr;					// the pointer to our Direct3D device interface
 		D3D12_VIEWPORT				m_ViewPort;							// viewport structure
-		D3D12_RECT					M_ScissorRect;						// scissor rect structure
+		D3D12_RECT					m_ScissorRect;						// scissor rect structure
 		IDXGISwapChain3*			m_pSwapChain = nullptr;				// the pointer to the swap chain interface
 		ID3D12Resource*				m_pRenderTagets[kFrameCount];		// the pointer to rendering buffer. [descriptor]
 		ID3D12CommandAllocator*		m_pCommandAllocator = nullptr;		// the pointer to command buffer allocator
