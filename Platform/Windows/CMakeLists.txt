@@ -11,6 +11,6 @@ add_executable(ZetaEngineOpenGL
     )
 
 target_link_libraries(ZetaEngineOpenGL WindowsApplication Common OpenGLRHI ${OPENGL_LIBRARIES})
-target_include_directories(ZetaEngineOpenGL PRIVATE "${PROJECT_SOURCE_DIR}/External/GL/include")
+target_include_directories(ZetaEngineOpenGL PRIVATE "${PROJECT_SOURCE_DIR}/External/src/glad/include")
 
 add_subdirectory(test)
