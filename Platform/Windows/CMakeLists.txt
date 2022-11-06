@@ -7,7 +7,7 @@ find_package(OpenGL REQUIRED)
 
 add_executable(ZetaEngineOpenGL 
     OpenGLApplication.cpp
-    ${PROJECT_SOURCE_DIR}/External/src/glad/src/glad_wgl.c
+    ${PROJECT_SOURCE_DIR}/External/GL/src/glad_wgl.c
     )
 
 target_link_libraries(ZetaEngineOpenGL WindowsApplication Common OpenGLRHI ${OPENGL_LIBRARIES})

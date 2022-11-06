@@ -1,5 +1,5 @@
 #include <iostream>
-#include "geommath.hpp"
+#include "../geommath.hpp"
 
 using namespace std;
 using namespace ZetaEngine;

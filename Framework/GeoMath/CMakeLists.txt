@@ -1,7 +1,7 @@
 IF(${WIN32})
         SET(GEOMMATH_LIB_FILE ${CMAKE_CURRENT_BINARY_DIR}/GeomMath.lib)
         SET(ISPC_COMPILER ispc.exe)
-        SET(ISPC_COMPILER_PATH ${PROJECT_SOURCE_DIR}/External/Windows/bin/)
+        SET(ISPC_COMPILER_PATH ${PROJECT_SOURCE_DIR}/External/ispc/)
         if($ENV{VSCMD_ARG_TGT_ARCH} MATCHES "x64")
             SET(ISPC_OPTIONS --arch=x86-64)
             SET(LIBRARIAN_COMMAND lib /MACHINE:X64 /OUT:${GEOMMATH_LIB_FILE})
@@ -12,7 +12,7 @@ IF(${WIN32})
 ELSE()
         SET(GEOMMATH_LIB_FILE ${CMAKE_CURRENT_BINARY_DIR}/libGeomMath.a)
         SET(ISPC_COMPILER ispc)
-        SET(ISPC_COMPILER_PATH ${PROJECT_SOURCE_DIR}/External/Linux/bin)
+        SET(ISPC_COMPILER_PATH ${PROJECT_SOURCE_DIR}/External/ispc/)
         SET(ISPC_OPTIONS --arch=x86-64)
         SET(LIBRARIAN_COMMAND ar -crv -o ${GEOMMATH_LIB_FILE})
 ENDIF(${WIN32})
@@ -30,3 +30,4 @@ set_target_properties(GeomMath
 
 add_subdirectory(ispc)
 add_subdirectory(test)
+

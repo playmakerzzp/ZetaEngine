@@ -15,7 +15,7 @@ endforeach(FUNC)
 
 add_custom_command(OUTPUT ${GEOMMATH_LIB_FILE}
         COMMAND ${LIBRARIAN_COMMAND} ${OBJECTS}
-        # COMMAND rm -v ${OBJECTS}
+        #COMMAND rm -v ${OBJECTS}
         DEPENDS ${OBJECTS}
         )
 
