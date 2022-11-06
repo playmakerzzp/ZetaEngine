@@ -1,2 +1,2 @@
 add_subdirectory(Common)
-add_subdirectory(GeoMath)
+add_subdirectory(GeomMath)
