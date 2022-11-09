@@ -26,3 +26,4 @@ Framework/GeomMath/include/*
 .vscode
 External/Windows/tools/msbuild/Win32/*
 ZetaEngine-build
+External/src/*
