@@ -14,4 +14,6 @@ namespace ZetaEngine
 
 			virtual void Tick() override;
 	};
+
+	extern GraphicsManager* g_pGraphicsManager;
 }

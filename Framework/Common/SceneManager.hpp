@@ -17,4 +17,6 @@ namespace ZetaEngine {
     protected:
         SceneEmptyNode m_RootNode;
     };
+
+    extern SceneManager* g_pSceneManager;
 }
