@@ -1,5 +1,6 @@
 #pragma once
 #include "geommath.hpp"
+#include <ostream>
 #include <stdint.h>
 
 namespace ZetaEngine
@@ -13,4 +14,6 @@ namespace ZetaEngine
         uint32_t pitch;
         size_t data_size;
     };
+
+    std::ostream& operator<<(std::ostream& out, const Image& image);
 }
