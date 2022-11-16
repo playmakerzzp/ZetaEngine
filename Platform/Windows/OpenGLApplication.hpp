@@ -14,6 +14,7 @@ namespace ZetaEngine
 		virtual void Tick() override;
 
 	private:
+		HDC   m_hDC;
 		HGLRC m_RenderContext;
 	};
 }

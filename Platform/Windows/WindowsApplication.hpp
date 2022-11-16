@@ -1,28 +1,32 @@
 #pragma once
-
-#include <Windows.h>
+// include the basic windows header file
+#include <windows.h>
 #include <windowsx.h>
 #include "BaseApplication.hpp"
 
-namespace ZetaEngine
-{
-	class WindowsApplication : public BaseApplication
-	{
-	public:
-		WindowsApplication(GfxConfiguration& config)
-			:BaseApplication(config)
-		{};
+namespace ZetaEngine {
+    class WindowsApplication : public BaseApplication
+    {
+    public:
+        WindowsApplication(GfxConfiguration& config)
+            : BaseApplication(config) {};
 
-		virtual int Initialize() override;
-		virtual void Finalize() override;
+        virtual int Initialize();
+        virtual void Finalize();
+        // One cycle of the main loop
+        virtual void Tick();
 
-		virtual void Tick();
+        HWND GetMainWindow() { return m_hWnd; }
 
-		static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    private:
+        // the WindowProc function prototype
+        static LRESULT CALLBACK WindowProc(HWND hWnd,
+                         UINT message,
+                         WPARAM wParam,
+                         LPARAM lParam);
 
-		inline HWND GetMainWindow() { return m_hWnd; }
-
-	private:
-		HWND m_hWnd;
-	};
+    protected:
+        HWND m_hWnd;
+    };
 }
+
