@@ -1,26 +1,35 @@
 #pragma once
 #include "IApplication.hpp"
-#include "GfxConfiguration.hpp"
+#include "GraphicsManager.hpp"
+#include "MemoryManager.hpp"
+#include "AssetLoader.hpp"
+#include "SceneManager.hpp"
 
-namespace ZetaEngine
-{
+namespace ZetaEngine {
     class BaseApplication : implements IApplication
     {
     public:
-        explicit BaseApplication(GfxConfiguration& cfg);
-        BaseApplication() = delete;
-        virtual int Initialize() override;
-        virtual void Finalize() override;
+        BaseApplication(GfxConfiguration& cfg);
+        virtual int Initialize();
+        virtual void Finalize();
+        // One cycle of the main loop
+        virtual void Tick();
 
-        virtual void Tick() override;
-
-        virtual bool IsQuit() override;
+        virtual bool IsQuit();
 
         inline GfxConfiguration& GetConfiguration() { return m_Config; };
+
+    protected:
+        virtual void OnDraw() {};
 
     protected:
         // Flag if need quit the main loop of the application
         static bool m_bQuit;
         GfxConfiguration m_Config;
+
+    private:
+        // hide the default construct to enforce a configuration
+        BaseApplication(){};
     };
 }
+

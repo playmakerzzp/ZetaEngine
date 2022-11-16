@@ -6,6 +6,8 @@ Image.cpp
 MemoryManager.cpp
 AssetLoader.cpp
 SceneManager.cpp
+SceneObject.cpp
+SceneParser.cpp
 main.cpp
 )
 

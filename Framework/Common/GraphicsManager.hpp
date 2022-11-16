@@ -13,6 +13,9 @@ namespace ZetaEngine
 			virtual void Finalize() override;
 
 			virtual void Tick() override;
+
+			virtual void Clear();
+			virtual void Draw();
 	};
 
 	extern GraphicsManager* g_pGraphicsManager;

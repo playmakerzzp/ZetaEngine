@@ -20,3 +20,13 @@ void ZetaEngine::GraphicsManager::Tick()
 {
 
 }
+
+void GraphicsManager::Clear()
+{
+
+}
+
+void GraphicsManager::Draw()
+{
+	
+}
