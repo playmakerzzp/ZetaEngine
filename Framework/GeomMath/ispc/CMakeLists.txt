@@ -1,5 +1,6 @@
-set(FUNCTIONS CrossProduct DotProduct MulByElement Transpose Normalize
-              Transform AddByElement SubByElement
+set(FUNCTIONS CrossProduct MulByElement Transpose Normalize
+              Transform AddByElement SubByElement MatrixExchangeYandZ
+              InverseMatrix4X4f
         )
 
 foreach(FUNC IN LISTS FUNCTIONS)
