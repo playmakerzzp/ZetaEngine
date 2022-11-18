@@ -5,9 +5,9 @@ GraphicsManager.cpp
 Image.cpp
 MemoryManager.cpp
 AssetLoader.cpp
+Scene.cpp
 SceneManager.cpp
 SceneObject.cpp
-SceneParser.cpp
 main.cpp
 )
 
