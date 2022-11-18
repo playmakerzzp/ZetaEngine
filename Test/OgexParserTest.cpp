@@ -9,11 +9,11 @@ using namespace std;
 
 namespace ZetaEngine {
     MemoryManager* g_pMemoryManager = new MemoryManager();
-    AssetLoader* g_pAssetLoader = new AssetLoader();
+    AssetLoader*   g_pAssetLoader   = new AssetLoader();
 }
 
-template<typename T>
-static ostream& operator<<(ostream& out, unordered_map<string, shared_ptr<T>> map)
+template<typename Key, typename T>
+static ostream& operator<<(ostream& out, unordered_map<Key, T> map)
 {
     for (auto p : map)
     {
@@ -23,14 +23,14 @@ static ostream& operator<<(ostream& out, unordered_map<string, shared_ptr<T>> ma
     return out;
 }
 
-int main(int, char**)
+int main(int , char** )
 {
     g_pMemoryManager->Initialize();
     g_pAssetLoader->Initialize();
 
     string ogex_text = g_pAssetLoader->SyncOpenAndReadTextFileToString("Scene/Example.ogex");
 
-    OgexParser* ogex_parser = new OgexParser();
+    OgexParser* ogex_parser = new OgexParser ();
     unique_ptr<Scene> pScene = ogex_parser->Parse(ogex_text);
     delete ogex_parser;
 
@@ -44,7 +44,7 @@ int main(int, char**)
 
     cout << "Dump of Lights" << endl;
     cout << "---------------------------" << endl;
-    cout << pScene->Lights << endl;
+    cout << pScene->Lights  << endl;
 
     cout << "Dump of Geometries" << endl;
     cout << "---------------------------" << endl;

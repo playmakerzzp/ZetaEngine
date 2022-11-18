@@ -8,9 +8,9 @@ using namespace ZetaEngine;
 using namespace std;
 
 namespace ZetaEngine {
-    MemoryManager* g_pMemoryManager = new MemoryManager();
-    AssetLoader* g_pAssetLoader = new AssetLoader();
-    SceneManager* g_pSceneManager = new SceneManager();
+    MemoryManager*  g_pMemoryManager = new MemoryManager();
+    AssetLoader*    g_pAssetLoader   = new AssetLoader();
+    SceneManager*   g_pSceneManager  = new SceneManager();
 }
 
 template<typename T>
@@ -24,46 +24,46 @@ static ostream& operator<<(ostream& out, unordered_map<string, shared_ptr<T>> ma
     return out;
 }
 
-int main(int, char**)
+int main(int , char** )
 {
     g_pMemoryManager->Initialize();
     g_pSceneManager->Initialize();
     g_pAssetLoader->Initialize();
 
-    g_pSceneManager->LoadScene("Scene/cube.ogex");
+    g_pSceneManager->LoadScene("Scene/test.ogex");
     auto& scene = g_pSceneManager->GetSceneForRendering();
 
     cout << "Dump of Cameras" << endl;
     cout << "---------------------------" << endl;
-    weak_ptr<SceneObjectCamera> pCamera = scene.GetFirstCamera();
-    while (auto pObj = pCamera.lock())
+    weak_ptr<SceneObjectCamera> pCamera = scene.GetCamera(scene.GetFirstCameraNode()->GetSceneObjectRef());
+    while(auto pObj = pCamera.lock())
     {
         cout << *pObj << endl;
-        pCamera = scene.GetNextCamera();
+        pCamera = scene.GetCamera(scene.GetNextCameraNode()->GetSceneObjectRef());
     }
 
     cout << "Dump of Lights" << endl;
     cout << "---------------------------" << endl;
-    weak_ptr<SceneObjectLight> pLight = scene.GetFirstLight();
-    while (auto pObj = pLight.lock())
+    weak_ptr<SceneObjectLight> pLight = scene.GetLight(scene.GetFirstLightNode()->GetSceneObjectRef());
+    while(auto pObj = pLight.lock())
     {
         cout << *pObj << endl;
-        pLight = scene.GetNextLight();
+        pLight = scene.GetLight(scene.GetNextLightNode()->GetSceneObjectRef());
     }
 
     cout << "Dump of Geometries" << endl;
     cout << "---------------------------" << endl;
-    weak_ptr<SceneObjectGeometry> pGeometry = scene.GetFirstGeometry();
-    while (auto pObj = pGeometry.lock())
+    weak_ptr<SceneObjectGeometry> pGeometry = scene.GetGeometry(scene.GetFirstGeometryNode()->GetSceneObjectRef());
+    while(auto pObj = pGeometry.lock())
     {
         cout << *pObj << endl;
-        pGeometry = scene.GetNextGeometry();
+        pGeometry = scene.GetGeometry(scene.GetNextGeometryNode()->GetSceneObjectRef());
     }
 
     cout << "Dump of Materials" << endl;
     cout << "---------------------------" << endl;
     weak_ptr<SceneObjectMaterial> pMaterial = scene.GetFirstMaterial();
-    while (auto pObj = pMaterial.lock())
+    while(auto pObj = pMaterial.lock())
     {
         cout << *pObj << endl;
         pMaterial = scene.GetNextMaterial();
