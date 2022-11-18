@@ -4,55 +4,58 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <memory>
 #include "glad/glad.h"
 
-namespace ZetaEngine
-{
-	class OpenGLGraphicsManager : public GraphicsManager
-	{
-	public:
-		virtual int Initialize() override;
-		virtual void Finalize() override;
+namespace ZetaEngine {
+    class OpenGLGraphicsManager : public GraphicsManager
+    {
+    public:
+        virtual int Initialize();
+        virtual void Finalize();
 
-		virtual void Tick() override;
+        virtual void Tick();
 
-		virtual void Clear() override;
+        virtual void Clear();
 
-		virtual void Draw() override;
-	private:
-		bool SetShaderParameters(float* worldMatrix, float* viewMatrix, float* projectMatrix);
+        virtual void Draw();
 
-		void InitializeBuffers();
-		void RenderBuffers();
-		void CalculateCameraPosition();
-		bool InitializeShader(const char* vsFilename, const char* fsFilename);
-	
-	private:
-		unsigned int m_vertexShader;
-		unsigned int m_fragmentShader;
-		unsigned int m_shaderProgram;
+    private:
+        bool SetPerBatchShaderParameters(const char* paramName, float* param);
+        bool SetPerFrameShaderParameters();
 
-		const bool VSYNC_ENABLED = true;
-		const float screenDepth = 1000.0f;
-		const float screenNear = 0.1f;
+        void InitializeBuffers();
+        void RenderBuffers();
+        void CalculateCameraMatrix();
+        void CalculateLights();
+        bool InitializeShader(const char* vsFilename, const char* fsFilename);
 
-		struct DrawBatchContext 
-		{
-			GLuint vao;
-			GLenum mode;
-			GLenum type;
-			GLsizei count;
-		};
+    private:
+        unsigned int m_vertexShader;
+        unsigned int m_fragmentShader;
+        unsigned int m_shaderProgram;
 
-		std::vector<DrawBatchContext> m_VAO;
-		std::unordered_map<std::string, unsigned int> m_Buffers;
+        struct DrawFrameContext {
+            Matrix4X4f  m_worldMatrix;
+            Matrix4X4f  m_viewMatrix;
+            Matrix4X4f  m_projectionMatrix;
+            Vector3f    m_lightPosition;
+            Vector4f    m_lightColor;
+        };
 
-		float m_positionX = 0, m_positionY = 0, m_positionZ = -10;
-		float m_rotationX = 0, m_rotationY = 0, m_rotationZ = 0;
-		Matrix4X4f m_worldMatrix;
-		Matrix4X4f m_viewMatrix;
-		Matrix4X4f m_projectionMatrix;
-	};
+        struct DrawBatchContext {
+            GLuint  vao;
+            GLenum  mode;
+            GLenum  type;
+            GLsizei count;
+            std::shared_ptr<Matrix4X4f> transform;
+        };
 
-	
+        DrawFrameContext    m_DrawFrameContext;
+        std::vector<DrawBatchContext> m_DrawBatchContext;
+        std::vector<GLuint> m_Buffers;
+    };
+
 }
+
+
