@@ -18,7 +18,7 @@ namespace ZetaEngine {
     SceneManager*    g_pSceneManager    = static_cast<SceneManager*>(new SceneManager);
 }
 
-static LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK TmpWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uiMsg)
 	{
@@ -36,9 +36,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lPa
 int ZetaEngine::OpenGLApplication::Initialize()
 {
     int result;
-	auto colorBits = m_Config.redBits + m_Config.greenBits + m_Config.blueBits;
+	auto colorBits = m_Config.redBits + m_Config.greenBits + m_Config.blueBits; // note on windows this does not include alpha bitplane
 
-	// create a temporary window for OpenGL context loading
 	DWORD Style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 	WNDCLASSEX WndClassEx;
 	memset(&WndClassEx, 0, sizeof(WNDCLASSEX));
@@ -47,7 +46,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
 
 	WndClassEx.cbSize = sizeof(WNDCLASSEX);
 	WndClassEx.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	WndClassEx.lpfnWndProc = WndProc;
+	WndClassEx.lpfnWndProc = TmpWndProc;
 	WndClassEx.hInstance = hInstance;
 	WndClassEx.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	WndClassEx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -64,6 +63,9 @@ int ZetaEngine::OpenGLApplication::Initialize()
 	pfd.dwFlags    = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.cColorBits = colorBits;
+	pfd.cRedBits = m_Config.redBits;
+	pfd.cGreenBits = m_Config.greenBits;
+	pfd.cBlueBits = m_Config.blueBits;
 	pfd.cAlphaBits = m_Config.alphaBits;
 	pfd.cDepthBits = m_Config.depthBits;
 	pfd.cStencilBits = m_Config.stencilBits;
@@ -108,6 +110,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
 	ReleaseDC(TemphWnd, TemphDC);
 	DestroyWindow(TemphWnd);
 
+	// now initialize our application window
 	result = WindowsApplication::Initialize();
 	if (result) {
 		printf("Windows Application initialize failed!");
@@ -126,10 +129,13 @@ int ZetaEngine::OpenGLApplication::Initialize()
 			WGL_DOUBLE_BUFFER_ARB,  GL_TRUE,
 			WGL_PIXEL_TYPE_ARB,     WGL_TYPE_RGBA_ARB,
 			WGL_COLOR_BITS_ARB,     colorBits,
-            WGL_ALPHA_BITS_ARB,     m_Config.alphaBits,
+			WGL_RED_BITS_ARB,		m_Config.redBits,
+			WGL_GREEN_BITS_ARB,		m_Config.greenBits,
+			WGL_BLUE_BITS_ARB,		m_Config.blueBits,
+			WGL_ALPHA_BITS_ARB,		m_Config.alphaBits,
 			WGL_DEPTH_BITS_ARB,     m_Config.depthBits,
 			WGL_STENCIL_BITS_ARB,   m_Config.stencilBits,
-			WGL_SAMPLE_BUFFERS_ARB, 1,
+			WGL_SAMPLE_BUFFERS_ARB, 1,  // 4x MSAA
 			WGL_SAMPLES_ARB,        4,  // 4x MSAA
 			0
 		};
@@ -150,7 +156,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
 		
 		const int context_attributes[] = {
 			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-			WGL_CONTEXT_MINOR_VERSION_ARB, 2,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
 			WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
 			WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
 			0
