@@ -281,7 +281,7 @@ namespace ZetaEngine {
                             matrix = data;
                             if (!m_bUpIsYAxis) {
                                 // exchange y and z
-                                ExchangeYandZ(matrix);
+                                // ExchangeYandZ(matrix);
                             }
                             transform = std::make_shared<SceneObjectTransform>(matrix, object_flag);
                             base_node->AppendChild(std::move(transform));
@@ -344,8 +344,7 @@ namespace ZetaEngine {
 
                         if (!strncmp(_type_str, "infinite", 8))
                         {
-                            // ToDo: implement this
-                            return;
+                            light = std::make_shared<SceneObjectInfiniteLight>();
                         }
                         else if (!strncmp(_type_str, "point", 5))
                         {

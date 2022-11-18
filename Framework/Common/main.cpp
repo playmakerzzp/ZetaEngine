@@ -1,10 +1,11 @@
 #include <cstdio>
 #include <chrono>
+#include <stdio.h>
 #include <thread>
 #include "BaseApplication.hpp"
 
 using namespace ZetaEngine;
-
+using namespace std;
 int main(int argc, char** argv) {
 	int ret;
 
@@ -28,9 +29,17 @@ int main(int argc, char** argv) {
 		return ret;
 	}
 
-    g_pSceneManager->LoadScene("Scene/test.ogex");
+   string scene_file_name = "Scene/test.ogex";
+   if(argc > 1)
+   {
+	scene_file_name = argv[1];
+   }
 
-
+	if((ret = g_pSceneManager->LoadScene(scene_file_name.c_str())) != 0)
+	{
+		printf("Unable to load scene: %s\n", scene_file_name.c_str());
+		return ret;
+	}
 	if ((ret = g_pGraphicsManager->Initialize()) != 0) {
 		printf("Graphics Manager Initialize failed, will exit now.");
 		return ret;

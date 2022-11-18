@@ -7,22 +7,24 @@ namespace ZetaEngine {
     class SceneManager : implements IRuntimeModule
     {
     public:
-        virtual ~SceneManager() override;
+        virtual ~SceneManager();
 
-        virtual int Initialize() override;
-        virtual void Finalize() override;
+        virtual int Initialize();
+        virtual void Finalize();
 
-        virtual void Tick() override;
-        
-        void LoadScene(const char* scene_file_name);
+        virtual void Tick();
+
+        int LoadScene(const char* scene_file_name);
 
         const Scene& GetSceneForRendering();
 
     protected:
-        void LoadOgexScene(const char* scene_file_name);
+        bool LoadOgexScene(const char* ogex_scene_file_name);
+
     protected:
-        std::unique_ptr<Scene> m_pScene;
+        std::unique_ptr<Scene>  m_pScene;
     };
 
-    extern SceneManager* g_pSceneManager;
+    extern SceneManager*    g_pSceneManager;
 }
+
