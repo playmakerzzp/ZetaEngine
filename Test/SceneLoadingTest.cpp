@@ -4,10 +4,10 @@
 #include "MemoryManager.hpp"
 #include "SceneManager.hpp"
 
-using namespace My;
+using namespace ZetaEngine;
 using namespace std;
 
-namespace My {
+namespace ZetaEngine {
     MemoryManager*  g_pMemoryManager = new MemoryManager();
     AssetLoader*    g_pAssetLoader   = new AssetLoader();
     SceneManager*   g_pSceneManager  = new SceneManager();
