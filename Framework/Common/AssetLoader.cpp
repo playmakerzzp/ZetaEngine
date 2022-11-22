@@ -46,7 +46,7 @@ bool ZetaEngine::AssetLoader::RemoveSearchPath(const char *path)
 
 bool ZetaEngine::AssetLoader::FileExists(const char *filePath)
 {
-    AssetFilePtr fp = OpenFile(filePath, MY_OPEN_BINARY);
+    AssetFilePtr fp = OpenFile(filePath, ZetaEngine_OPEN_BINARY);
     if (fp != nullptr) {
         CloseFile(fp);
         return true;
@@ -79,10 +79,10 @@ ZetaEngine::AssetLoader::AssetFilePtr ZetaEngine::AssetLoader::OpenFile(const ch
             fprintf(stderr, "Trying to open %s\n", fullPath.c_str());
 #endif
             switch(mode) {
-                case MY_OPEN_TEXT:
+                case ZetaEngine_OPEN_TEXT:
                 fp = fopen(fullPath.c_str(), "r");
                 break;
-                case MY_OPEN_BINARY:
+                case ZetaEngine_OPEN_BINARY:
                 fp = fopen(fullPath.c_str(), "rb");
                 break;
             }
@@ -99,15 +99,15 @@ ZetaEngine::AssetLoader::AssetFilePtr ZetaEngine::AssetLoader::OpenFile(const ch
 
 ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadText(const char *filePath)
 {
-    AssetFilePtr fp = OpenFile(filePath, MY_OPEN_TEXT);
+    AssetFilePtr fp = OpenFile(filePath, ZetaEngine_OPEN_TEXT);
     Buffer* pBuff = nullptr;
 
     if (fp) {
         size_t length = GetSize(fp);
 
         pBuff = new Buffer(length + 1);
-        fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
-        pBuff->m_pData[length] = '\0';
+        length = fread(pBuff->GetData(), 1, length, static_cast<FILE*>(fp));
+        pBuff->GetData()[length] = '\0';
 
         CloseFile(fp);
     } else {
@@ -124,14 +124,14 @@ ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadText(const char *file
 
 ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadBinary(const char *filePath)
 {
-    AssetFilePtr fp = OpenFile(filePath, MY_OPEN_BINARY);
+    AssetFilePtr fp = OpenFile(filePath, ZetaEngine_OPEN_BINARY);
     Buffer* pBuff = nullptr;
 
     if (fp) {
         size_t length = GetSize(fp);
 
         pBuff = new Buffer(length);
-        fread(pBuff->m_pData, length, 1, static_cast<FILE*>(fp));
+        fread(pBuff->GetData(), length, 1, static_cast<FILE*>(fp));
 
         CloseFile(fp);
     } else {
@@ -173,7 +173,7 @@ size_t ZetaEngine::AssetLoader::SyncRead(const AssetFilePtr& fp, Buffer& buf)
         return 0;
     }
 
-    sz = fread(buf.m_pData, buf.m_szSize, 1, static_cast<FILE*>(fp));
+    sz = fread(buf.GetData(), buf.GetDataSize(), 1, static_cast<FILE*>(fp));
 
 
     return sz;

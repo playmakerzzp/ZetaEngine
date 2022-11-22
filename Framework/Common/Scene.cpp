@@ -34,7 +34,7 @@ const shared_ptr<SceneObjectMaterial> Scene::GetMaterial(const std::string& key)
 {
     auto i = Materials.find(key);
     if (i == Materials.end())
-        return nullptr;
+        return m_pDefaultMaterial;
     else
         return i->second;
 }
@@ -97,4 +97,12 @@ const shared_ptr<SceneCameraNode> Scene::GetNextCameraNode() const
     return ((++_it == CameraNodes.cend()) ? 
             nullptr 
             : _it->second);
+}
+
+void Scene::LoadResource()
+{
+    for (auto material : Materials)
+    {
+        material.second->LoadTextures();
+    }
 }

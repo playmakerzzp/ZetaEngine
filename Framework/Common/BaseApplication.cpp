@@ -32,6 +32,12 @@ void ZetaEngine::BaseApplication::Tick()
 {
 }
 
+void ZetaEngine::BaseApplication::SetCommandLineParameters(int argc, char** argv)
+{
+    m_nArgC = argc;
+    m_ppArgV = argv;
+}
+
 bool ZetaEngine::BaseApplication::IsQuit()
 {
 	return m_bQuit;

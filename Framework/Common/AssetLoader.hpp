@@ -12,22 +12,22 @@ namespace ZetaEngine {
     public:
         virtual ~AssetLoader() {};
 
-        virtual int Initialize() override;
-        virtual void Finalize() override;
+        virtual int Initialize();
+        virtual void Finalize();
 
-        virtual void Tick() override;
+        virtual void Tick();
 
         typedef void* AssetFilePtr;
 
         enum AssetOpenMode {
-            MY_OPEN_TEXT   = 0, /// Open In Text Mode
-            MY_OPEN_BINARY = 1, /// Open In Binary Mode 
+            ZetaEngine_OPEN_TEXT   = 0, /// Open In Text Mode
+            ZetaEngine_OPEN_BINARY = 1, /// Open In Binary Mode 
         };
 
         enum AssetSeekBase {
-            MY_SEEK_SET = 0, /// SEEK_SET
-            MY_SEEK_CUR = 1, /// SEEK_CUR
-            MY_SEEK_END = 2  /// SEEK_END
+            ZetaEngine_SEEK_SET = 0, /// SEEK_SET
+            ZetaEngine_SEEK_CUR = 1, /// SEEK_CUR
+            ZetaEngine_SEEK_END = 2  /// SEEK_END
         };
 
         bool AddSearchPath(const char *path);
@@ -54,7 +54,7 @@ namespace ZetaEngine {
         {
             std::string result;
             Buffer buffer = SyncOpenAndReadText(fileName);
-            char* content = reinterpret_cast<char*>(buffer.m_pData);
+            char* content = reinterpret_cast<char*>(buffer.GetData());
 
             if (content)
             {
@@ -67,6 +67,6 @@ namespace ZetaEngine {
         std::vector<std::string> m_strSearchPath;
 	};
 
-    extern AssetLoader* g_pAssetLoader;
+    extern AssetLoader*     g_pAssetLoader;
 }
 

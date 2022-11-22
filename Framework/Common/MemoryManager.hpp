@@ -1,27 +1,27 @@
 #pragma once
+#include <new>
 #include "IRuntimeModule.hpp"
 #include "Allocator.hpp"
-#include <new>
 
 namespace ZetaEngine {
     class MemoryManager : implements IRuntimeModule
     {
     public:
-        template<typename T, typename... Arguments>
+        template<class T, typename... Arguments>
         T* New(Arguments... parameters)
         {
             return new (Allocate(sizeof(T))) T(parameters...);
         }
 
-        template<typename T>
-        void Delete(T *p)
+        template<class T>
+        void Delete(T* p)
         {
-            reinterpret_cast<T*>(p)->~T();
+            p->~T();
             Free(p, sizeof(T));
         }
 
     public:
-        virtual ~MemoryManager() = default;
+        virtual ~MemoryManager() {}
 
         virtual int Initialize();
         virtual void Finalize();
@@ -33,10 +33,13 @@ namespace ZetaEngine {
     private:
         static size_t*        m_pBlockSizeLookup;
         static Allocator*     m_pAllocators;
+        static bool           m_bInitialized;
+        
     private:
         static Allocator* LookUpAllocator(size_t size);
+
     };
 
-    extern MemoryManager* g_pMemoryManager;
+    extern MemoryManager*   g_pMemoryManager;
 }
 
