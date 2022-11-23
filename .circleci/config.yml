@@ -11,10 +11,10 @@ jobs:
       - checkout
       - run: git lfs fetch
       - run: git lfs checkout
-      - run: ./build_crossguid.sh
-      - run: ./build_opengex.sh
-      - run: ./build_zlib.sh
-      - run: ./build.sh
+      - run: sudo ./build_crossguid.sh
+      - run: sudo ./build_opengex.sh
+      - run: sudo ./build_zlib.sh
+      - run: sudo ./build.sh
       - run: cmake --build ./build --target test
   build_macos:
     macos:
