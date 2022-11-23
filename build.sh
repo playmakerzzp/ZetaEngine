@@ -1,6 +1,7 @@
 #!/bin/bash
 mkdir -p build
-cd build
-cmake -G "Visual Studio 17 2022 Win64" ..
-cmake --build . --config debug
+pushd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build . --config Debug
+popd
 

@@ -3,6 +3,9 @@ project (ZetaEngine)
 
 set (CMAKE_C_STANDARD 99)
 set (CMAKE_CXX_STANDARD 11)
+if(NOT MSVC)
+set (CMAKE_CXX_FLAGS "-Wno-gnu-anonymous-struct -Wno-nested-anon-types")
+endif(NOT MSVC)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(TargetArchDetect)
@@ -15,20 +18,32 @@ else()
         set(ARCH_BIT 32)
 endif()
 
-include_directories("${PROJECT_SOURCE_DIR}")
-include_directories("${PROJECT_SOURCE_DIR}/Framework/Parser")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/Common")
-include_directories("${PROJECT_SOURCE_DIR}/Framework/Interface")
 include_directories("${PROJECT_SOURCE_DIR}/Framework/GeomMath")
+include_directories("${PROJECT_SOURCE_DIR}/Framework/Interface")
+include_directories("${PROJECT_SOURCE_DIR}/Framework/Parser")
 include_directories("${PROJECT_SOURCE_DIR}/RHI")
-include_directories("${PROJECT_SOURCE_DIR}/Platform/Empty/")
-include_directories("${PROJECT_SOURCE_DIR}/Platform/${CMAKE_SYSTEM_NAME}")
-set(MYGE_EXTERNAL_ROOT ${PROJECT_SOURCE_DIR}/External/${CMAKE_SYSTEM_NAME}/)
+include_directories("${PROJECT_SOURCE_DIR}/")
+IF(${UNIX})
+    IF(${APPLE})
+        set(MYGE_TARGET_PLATFORM "Darwin")
+    ELSE(${APPLE})
+        set(MYGE_TARGET_PLATFORM "Linux")
+    ENDIF(${APPLE})
+ELSEIF(${WIN32})
+    set(MYGE_TARGET_PLATFORM "Windows")
+ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES Orbis)
+    set(MYGE_TARGET_PLATFORM "Orbis")
+    set(ORBIS 1)
+ENDIF(${UNIX})
+include_directories("${PROJECT_SOURCE_DIR}/Platform/${MYGE_TARGET_PLATFORM}")
+set(MYGE_EXTERNAL_ROOT ${PROJECT_SOURCE_DIR}/External/${MYGE_TARGET_PLATFORM}/)
 include_directories("${MYGE_EXTERNAL_ROOT}include")
 set(MYGE_EXTERNAL_LIBRARY_PATH ${MYGE_EXTERNAL_ROOT}lib/)
-find_library(XG_LIBRARY xg PATHS ${MYGE_EXTERNAL_LIBRARY_PATH})
-find_library(OPENDDL_LIBRARY OpenDDL PATHS ${MYGE_EXTERNAL_LIBRARY_PATH})
-find_library(OPENGEX_LIBRARY OpenGEX PATHS ${MYGE_EXTERNAL_LIBRARY_PATH})
+find_library(XG_LIBRARY xg PATHS ${MYGE_EXTERNAL_LIBRARY_PATH} NO_CMAKE_FIND_ROOT_PATH)
+find_library(OPENDDL_LIBRARY OpenDDL PATHS ${MYGE_EXTERNAL_LIBRARY_PATH} NO_CMAKE_FIND_ROOT_PATH)
+find_library(OPENGEX_LIBRARY OpenGEX PATHS ${MYGE_EXTERNAL_LIBRARY_PATH} NO_CMAKE_FIND_ROOT_PATH)
+find_library(ZLIB_LIBRARY NAMES z zlib PATHS ${MYGE_EXTERNAL_LIBRARY_PATH} NO_CMAKE_FIND_ROOT_PATH NO_SYSTEM_ENVIRONMENT_PATH)
 include(CTest)
 include(CheckCXXSourceCompiles)
 include(PlatformDependencies)
@@ -42,7 +57,18 @@ int main(int argc, char** argv)
     return *my_int;
 }
 "
-HAVE_MAKE_UNIQUE)
+ HAVE_MAKE_UNIQUE)
+CHECK_CXX_SOURCE_COMPILES(
+"#include <algorithm>
+
+int main(int argc, char** argv)
+{
+    int result = -1;
+    result = std::clamp(result, 0, 1);
+    return result;
+}
+"
+ HAVE_CLAMP)
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_SOURCE_DIR}/config.h)
 add_subdirectory(Framework)
 add_subdirectory(Platform)
@@ -152,6 +178,9 @@ MESSAGE( STATUS "CYGWIN: " ${CYGWIN} )
 # is TRUE on Windows when using a Borland compiler 
 MESSAGE( STATUS "BORLAND: " ${BORLAND} )
 
+# is TRUE on PS4
+MESSAGE( STATUS "ORBIS: " ${ORBIS} )
+
 # Microsoft compiler 
 MESSAGE( STATUS "MSVC: " ${MSVC} )
 MESSAGE( STATUS "MSVC_IDE: " ${MSVC_IDE} )
@@ -225,7 +254,12 @@ MESSAGE( STATUS "CMAKE_CROSSCOMPILING: " ${CMAKE_CROSSCOMPILING} )
 
 MESSAGE( STATUS "TARGET_ARCH: " ${TARGET_ARCH} )
 
+MESSAGE( STATUS "XG_LIBRARY: " ${XG_LIBRARY} )
+MESSAGE( STATUS "OPENDDL_LIBRARY: " ${OPENDDL_LIBRARY} )
+MESSAGE( STATUS "OPENGEX_LIBRARY: " ${OPENGEX_LIBRARY} )
+
 #
 #MESSAGE( STATUS ": " ${} )
 
 # ------------------------- End of Generic CMake Variable Logging ------------------
+
