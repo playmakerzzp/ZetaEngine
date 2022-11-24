@@ -33,7 +33,7 @@ jobs:
              ./build_opengex.sh
              ./build_zlib.sh
              ./build.sh
-             cmake --build ./build --target test
+             cmake --build ./build
 workflows:
   version: 2
   build_and_test:
