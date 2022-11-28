@@ -9,13 +9,13 @@ jobs:
       - run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
       - run: apt install -y git-lfs
       - checkout
+      - run: git config lfs.url https://lfs.chenwenli.com
       - run: git lfs fetch
       - run: git lfs checkout
       - run: sh ./build_crossguid.sh
       - run: sh ./build_opengex.sh
       - run: sh ./build_zlib.sh
       - run: bash ./build.sh
-      - run: cmake --build ./build 
   build_macos:
     macos:
       xcode: "9.2.0"
