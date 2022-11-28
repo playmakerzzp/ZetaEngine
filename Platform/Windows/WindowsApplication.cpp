@@ -3,16 +3,8 @@
 
 using namespace ZetaEngine;
 
-int ZetaEngine::WindowsApplication::Initialize()
+void WindowsApplication::CreateMainWindow()
 {
-    int result;
-
-	// first call base class initialization
-    result = BaseApplication::Initialize();
-
-    if (result != 0)
-        exit(result);
-
     // get the HINSTANCE of the Console Program
     HINSTANCE hInstance = GetModuleHandle(NULL);
 
@@ -51,15 +43,32 @@ int ZetaEngine::WindowsApplication::Initialize()
     // display the window on the screen
     ShowWindow(m_hWnd, SW_SHOW);
 
+}
+
+int WindowsApplication::Initialize()
+{
+    int result;
+
+    CreateMainWindow();
+
+	// first call base class initialization
+    result = BaseApplication::Initialize();
+
+    if (result != 0)
+        exit(result);
+
     return result;
 }
 
-void ZetaEngine::WindowsApplication::Finalize()
+void WindowsApplication::Finalize()
 {
+    BaseApplication::Finalize();
 }
 
-void ZetaEngine::WindowsApplication::Tick()
+void WindowsApplication::Tick()
 {
+    BaseApplication::Tick();
+
     // this struct holds Windows event messages
     MSG msg;
 
@@ -76,7 +85,7 @@ void ZetaEngine::WindowsApplication::Tick()
 }
 
 // this is the main message handler for the program
-LRESULT CALLBACK ZetaEngine::WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WindowsApplication::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     WindowsApplication* pThis;
     if (message == WM_NCCREATE)
@@ -105,7 +114,7 @@ LRESULT CALLBACK ZetaEngine::WindowsApplication::WindowProc(HWND hWnd, UINT mess
             break;
         case WM_KEYUP:
             {
-                switch (wParam) 
+                switch(wParam)
                 {
                     case VK_LEFT:
                         g_pInputManager->LeftArrowKeyUp();
@@ -122,13 +131,12 @@ LRESULT CALLBACK ZetaEngine::WindowsApplication::WindowProc(HWND hWnd, UINT mess
                     default:
                         break;
                 }
-            }
+            } 
             break;
         case WM_KEYDOWN:
             {
-                // we will replace this with input manager
-                m_bQuit = true;
-                switch (wParam) {
+                switch(wParam)
+                {
                     case VK_LEFT:
                         g_pInputManager->LeftArrowKeyDown();
                         break;
@@ -144,7 +152,6 @@ LRESULT CALLBACK ZetaEngine::WindowsApplication::WindowProc(HWND hWnd, UINT mess
                     default:
                         break;
                 }
-                break;
             } 
             break;
 
