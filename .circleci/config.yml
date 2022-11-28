@@ -14,13 +14,13 @@ jobs:
       - checkout
       - run:
           name: Git LFS Checkout 
-          command:
+          command: |
             git config lfs.url https://lfs.chenwenli.com
             git lfs fetch
             git lfs checkout
       - run: 
           name: Build
-          command:
+          command: |
             sh ./build_crossguid.sh
             sh ./build_opengex.sh
             sh ./build_zlib.sh

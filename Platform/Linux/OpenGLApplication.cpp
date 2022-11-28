@@ -1,20 +1,11 @@
-#include <stdio.h>
+#include <cstdio>
 #include <climits>
 #include <cstring>
 #include <X11/Xlib-xcb.h>
 #include "OpenGLApplication.hpp"
-#include "OpenGL/OpenGLGraphicsManager.hpp"
-#include "MemoryManager.hpp"
 
 using namespace ZetaEngine;
-
-namespace ZetaEngine {
-    GfxConfiguration config(8, 8, 8, 8, 24, 8, 0, 960, 540, "Game Engine From Scratch (Linux)");
-    IApplication* g_pApp                = static_cast<IApplication*>(new OpenGLApplication(config));
-    GraphicsManager* g_pGraphicsManager = static_cast<GraphicsManager*>(new OpenGLGraphicsManager);
-    MemoryManager*   g_pMemoryManager   = static_cast<MemoryManager*>(new MemoryManager);
-
-}
+using namespace std;
 
 // Helper to check for extension string presence.  Adapted from:
 //   http://www.opengl.org/resources/features/OGLextensions/
@@ -160,11 +151,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
     m_pScreen = screen_iter.data;
     m_nVi = vi->visualid;
 
-    result = XcbApplication::Initialize();
-    if (result) {
-        printf("Xcb Application initialize failed!");
-	return -1;
-    }
+    CreateMainWindow();
 
     /* Get the default screen's GLX extension list */
     glxExts = glXQueryExtensionsString(m_pDisplay, default_screen);
@@ -191,7 +178,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
         int context_attribs[] =
           {
             GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-            GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+            GLX_CONTEXT_MINOR_VERSION_ARB, 3,
             None
           };
 
@@ -201,7 +188,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
 
         XSync(m_pDisplay, False);
         if (!ctxErrorOccurred && m_Context)
-          printf( "Created GL 3.0 context\n" );
+          printf( "Created GL 3.3 context\n" );
         else
         {
           /* GLX_CONTEXT_MAJOR_VERSION_ARB = 1 */
@@ -211,7 +198,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
 
           ctxErrorOccurred = false;
 
-          printf( "Failed to create GL 3.0 context"
+          printf( "Failed to create GL 3.3 context"
                   " ... using old-style GLX context\n" );
           m_Context = glXCreateContextAttribsARB(m_pDisplay, fb_config, 0, 
                                             True, context_attribs );
@@ -269,6 +256,9 @@ int ZetaEngine::OpenGLApplication::Initialize()
     }
 
     XFree(vi);
+
+    result = BaseApplication::Initialize();
+
     return result;
 }
 
@@ -284,6 +274,8 @@ void ZetaEngine::OpenGLApplication::Tick()
 
 void ZetaEngine::OpenGLApplication::OnDraw()
 {
+    g_pGraphicsManager->Clear();
+    g_pGraphicsManager->Draw();
     glXSwapBuffers(m_pDisplay, m_Drawable);
 }
 

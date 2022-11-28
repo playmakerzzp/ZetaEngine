@@ -1,6 +1,8 @@
 add_library(WindowsApplication WindowsApplication.cpp)
 
-add_executable(ZetaEngineD3d12 D3d12Application.cpp)
+add_executable(ZetaEngineD3d12 
+D3d12Application.cpp
+D3d12ApplicationConfig.cpp)
 target_link_libraries(ZetaEngineD3d12 WindowsApplication Common ${OPENGEX_LIBRARY} ${OPENDDL_LIBRARY} ${XG_LIBRARY} ${ZLIB_LIBRARY} D3dRHI d3d12 dxgi d3dcompiler)
 __add_xg_platform_dependencies(ZetaEngineD3d12)
 
@@ -8,6 +10,7 @@ find_package(OpenGL REQUIRED)
 
 add_executable(ZetaEngineOpenGL 
     OpenGLApplication.cpp
+    OpenGLApplicationConfig.cpp
     ${PROJECT_SOURCE_DIR}/External/src/glad/src/glad_wgl.c
     )
 target_link_libraries(ZetaEngineOpenGL WindowsApplication Common  ${OPENGEX_LIBRARY} ${OPENDDL_LIBRARY} ${XG_LIBRARY} ${ZLIB_LIBRARY} OpenGLRHI ${OPENGL_LIBRARIES})

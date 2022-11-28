@@ -1,14 +1,19 @@
-#include "WindowsApplication.hpp"
-#include "D3d/D3d12GraphicsManager.hpp"
-#include "MemoryManager.hpp"
+#include "D3d12Application.hpp"
 #include <tchar.h>
+#include <wingdi.h>
+#include <winuser.h>
+
 
 using namespace ZetaEngine;
 
-namespace ZetaEngine
+void D3d12Application::Tick()
 {
-	GfxConfiguration config(8, 8, 8, 8, 32, 0, 0, 960, 540, _T("Zeta Engine(Windows"));
-	IApplication* g_pApp = static_cast<IApplication*>(new WindowsApplication(config));
-	GraphicsManager* g_pGraphicsManager = static_cast<GraphicsManager*>(new D3d12GraphicsManager);
-	MemoryManager* g_pMemoryManager = static_cast<MemoryManager*>(new MemoryManager);
+	WindowsApplication::Tick();
+	g_pGraphicsManager->Clear();
+	g_pGraphicsManager->Draw();
+
+	// Present the back buffer to the scene since rendering is complete
+	HDC hdc = GetDC(m_hWnd);
+	SwapBuffers(hdc);
+	ReleaseDC(m_hWnd, hdc);
 }
