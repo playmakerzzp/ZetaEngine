@@ -2,42 +2,33 @@ version: 2
 jobs:
   build_linux:
     docker:
-      - image: ubuntu:16.04
+      - image: ubuntu:20.04
     steps:
-      - run: apt update 
-      - run: apt install -y curl clang cmake git uuid-dev libx11-xcb-dev libgl1-mesa-dev
-      - run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-      - run: apt install -y git-lfs
+      - run: 
+          name: Install Dependencies
+          command: |
+            apt update 
+            apt install -y curl clang cmake git uuid-dev libx11-xcb-dev libgl1-mesa-dev
+            curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+            apt install -y git-lfs
       - checkout
-      - run: git config lfs.url https://lfs.chenwenli.com
-      - run: git lfs fetch
-      - run: git lfs checkout
-      - run: sh ./build_crossguid.sh
-      - run: sh ./build_opengex.sh
-      - run: sh ./build_zlib.sh
-      - run: bash ./build.sh
-  build_macos:
-    macos:
-      xcode: "9.2.0"
-    steps:
-      - checkout
-      - run: git lfs fetch
-      - run: git lfs checkout
-      - run: curl -L -o $(pwd)/MacPorts-2.4.2-10.12-Sierra.pkg https://github.com/macports/macports-base/releases/download/v2.4.2/MacPorts-2.4.2-10.12-Sierra.pkg
-      - run: sudo installer -package $(pwd)/MacPorts-2.4.2-10.12-Sierra.pkg -target /
-      - run: rm $(pwd)/MacPorts-2.4.2-10.12-Sierra.pkg
-      - run: |
-             export PATH=/opt/local/bin:/opt/local/sbin:$PATH 
-             sudo -E port -q install cmake xorg-libX11 xorg-libxcb mesa libGLU
-             ./build_crossguid.sh
-             ./build_opengex.sh
-             ./build_zlib.sh
-             ./build.sh
-             cmake --build ./build
+      - run:
+          name: Git LFS Checkout 
+          command:
+            git config lfs.url https://lfs.chenwenli.com
+            git lfs fetch
+            git lfs checkout
+      - run: 
+          name: Build
+          command:
+            sh ./build_crossguid.sh
+            sh ./build_opengex.sh
+            sh ./build_zlib.sh
+            bash ./build.sh
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build_linux
-      - build_macos
+      
 
