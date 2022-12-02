@@ -1,10 +1,11 @@
 #pragma once
-#inclue "WindowsApplication.hpp"
+#include "WindowsApplication.hpp"
 
 namespace ZetaEngine {
-    class D3d12Application : public WindowsApplication
+    class D3d12Application : public WindowsApplication 
     {
-        using WindowsApplication::WindowsApplication;
-        void Tick();
+        public:
+            using WindowsApplication::WindowsApplication;
+            void Tick();
     };
 }

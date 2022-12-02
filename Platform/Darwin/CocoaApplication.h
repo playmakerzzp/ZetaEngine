@@ -16,6 +16,9 @@ namespace ZetaEngine {
         virtual void Tick();
 
     protected:
+        void CreateWindow();
+
+    protected:
 #ifdef __OBJC__
         NSWindow* m_pWindow;
 #endif

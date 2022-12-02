@@ -20,7 +20,7 @@ static LRESULT CALLBACK TmpWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM 
 	return 0;
 }
 
-int ZetaEngine::OpenGLApplication::Initialize()
+int OpenGLApplication::Initialize()
 {
     int result;
 	auto colorBits = m_Config.redBits + m_Config.greenBits + m_Config.blueBits; // note on windows this does not include alpha bitplane
@@ -98,11 +98,7 @@ int ZetaEngine::OpenGLApplication::Initialize()
 	DestroyWindow(TemphWnd);
 
 	// now initialize our application window
-	result = WindowsApplication::Initialize();
-	if (result) {
-		printf("Windows Application initialize failed!");
-		return result;
-	}
+    WindowsApplication::CreateMainWindow();
 
 	m_hDC  = GetDC(m_hWnd);
 
@@ -190,14 +186,19 @@ int ZetaEngine::OpenGLApplication::Initialize()
 		{
 				return result;
 		}
+	}
 
-		result = 0;
+    result = BaseApplication::Initialize();
+
+	if (result) {
+		printf("Windows Application initialize failed!");
+		return result;
 	}
 
     return result;
 }
 
-void ZetaEngine::OpenGLApplication::Finalize()
+void OpenGLApplication::Finalize()
 {
     if (m_RenderContext) {
         wglMakeCurrent(NULL, NULL);
@@ -208,7 +209,7 @@ void ZetaEngine::OpenGLApplication::Finalize()
     WindowsApplication::Finalize();
 }
 
-void ZetaEngine::OpenGLApplication::Tick()
+void OpenGLApplication::Tick()
 {
     WindowsApplication::Tick();
     g_pGraphicsManager->Clear();

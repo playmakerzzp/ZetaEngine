@@ -1,4 +1,4 @@
-#pragma once
+#pragma oncenamespace
 #include <android/sensor.h>
 #include <android_native_app_glue.h>
 #include "BaseApplication.hpp"
