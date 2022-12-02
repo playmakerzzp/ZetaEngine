@@ -4,6 +4,7 @@
 #include "AssetLoader.hpp"
 #include "IApplication.hpp"
 #include "SceneManager.hpp"
+#include "PhysicsManager.hpp"
 
 const char VS_SHADER_SOURCE_FILE[] = "Shaders/basic_vs.glsl";
 const char PS_SHADER_SOURCE_FILE[] = "Shaders/basic_ps.glsl";
@@ -306,9 +307,9 @@ void OpenGLGraphicsManager::InitializeBuffers()
     auto& scene = g_pSceneManager->GetSceneForRendering();
 
     // Geometries
-    auto pGeometryNode = scene.GetFirstGeometryNode(); 
-    while (pGeometryNode)
+    for (auto _it : scene.GeometryNodes)
     {
+        auto pGeometryNode = _it.second;
         if (pGeometryNode->Visible()) 
         {
             auto pGeometry = scene.GetGeometry(pGeometryNode->GetSceneObjectRef());
@@ -449,15 +450,23 @@ void OpenGLGraphicsManager::InitializeBuffers()
                 if (material) {
                     auto color = material->GetBaseColor();
                     if (color.ValueMap) {
-                        auto texture = color.ValueMap->GetTextureImage();
+                        Image texture = color.ValueMap->GetTextureImage();
                         auto it = m_TextureIndex.find(material_key);
                         if (it == m_TextureIndex.end()) {
                             GLuint texture_id;
                             glGenTextures(1, &texture_id);
                             glActiveTexture(GL_TEXTURE0 + texture_id);
                             glBindTexture(GL_TEXTURE_2D, texture_id);
-                            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.Width, texture.Height, 
+                            if(texture.bitcount == 24)
+                            {
+                                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.Width, texture.Height, 
+                                    0, GL_RGB, GL_UNSIGNED_BYTE, texture.data);
+                            }
+                            else
+                            {
+                                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.Width, texture.Height, 
                                     0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
+                            }
                             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
                             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -473,14 +482,12 @@ void OpenGLGraphicsManager::InitializeBuffers()
                 dbc.vao     = vao;
                 dbc.mode    = mode;
                 dbc.type    = type;
-                dbc.count  = indexCount;
-                dbc.transform = pGeometryNode->GetCalculatedTransform();
+                dbc.count   = indexCount;
+                dbc.node    = pGeometryNode;
                 dbc.material = material;
                 m_DrawBatchContext.push_back(std::move(dbc));
             }
         }
-
-        pGeometryNode = scene.GetNextGeometryNode();
     }
 
     return;
@@ -494,7 +501,30 @@ void OpenGLGraphicsManager::RenderBuffers()
     {
         // Set the color shader as the current shader program and set the matrices that it will use for rendering.
         glUseProgram(m_shaderProgram);
-        SetPerBatchShaderParameters("modelMatrix", *dbc.transform);
+
+        Matrix4X4f trans = *dbc.node->GetCalculatedTransform();
+
+        if (void* rigidBody = dbc.node->RigidBody()) {
+            // the geometry has rigid body bounded, we blend the simlation result here.
+            Matrix4X4f simulated_result = g_pPhysicsManager->GetRigidBodyTransform(rigidBody);
+
+            // reset the translation part of the matrix
+            memcpy(trans[3], Vector3f(0.0f, 0.0f, 0.0f), sizeof(float) * 3);
+
+            // apply the rotation part of the simlation result
+            Matrix4X4f rotation;
+            BuildIdentityMatrix(rotation);
+            memcpy(rotation[0], simulated_result[0], sizeof(float) * 3);
+            memcpy(rotation[1], simulated_result[1], sizeof(float) * 3);
+            memcpy(rotation[2], simulated_result[2], sizeof(float) * 3);
+            trans = trans * rotation;
+
+            // replace the translation part of the matrix with simlation result directly
+            memcpy(trans[3], simulated_result[3], sizeof(float) * 3);
+
+        }
+
+        SetPerBatchShaderParameters("modelMatrix", trans);
         glBindVertexArray(dbc.vao);
 
         /* well, we have different material for each index buffer so we can not draw them together
