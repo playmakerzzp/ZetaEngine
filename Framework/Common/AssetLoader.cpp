@@ -1,21 +1,23 @@
 #include "AssetLoader.hpp"
 
-int ZetaEngine::AssetLoader::Initialize()
+using namespace ZetaEngine;
+
+int AssetLoader::Initialize()
 {
     return 0;
 }
 
-void ZetaEngine::AssetLoader::Finalize()
+void AssetLoader::Finalize()
 {
     m_strSearchPath.clear();
 }
 
-void ZetaEngine::AssetLoader::Tick()
+void AssetLoader::Tick()
 {
 
 }
 
-bool ZetaEngine::AssetLoader::AddSearchPath(const char *path)
+bool AssetLoader::AddSearchPath(const char *path)
 {
     std::vector<std::string>::iterator src = m_strSearchPath.begin();
 
@@ -29,7 +31,7 @@ bool ZetaEngine::AssetLoader::AddSearchPath(const char *path)
     return true;
 }
 
-bool ZetaEngine::AssetLoader::RemoveSearchPath(const char *path)
+bool AssetLoader::RemoveSearchPath(const char *path)
 {
     std::vector<std::string>::iterator src = m_strSearchPath.begin();
 
@@ -44,7 +46,7 @@ bool ZetaEngine::AssetLoader::RemoveSearchPath(const char *path)
     return true;
 }
 
-bool ZetaEngine::AssetLoader::FileExists(const char *filePath)
+bool AssetLoader::FileExists(const char *filePath)
 {
     AssetFilePtr fp = OpenFile(filePath, ZetaEngine_OPEN_BINARY);
     if (fp != nullptr) {
@@ -54,7 +56,7 @@ bool ZetaEngine::AssetLoader::FileExists(const char *filePath)
     return false;
 }
 
-ZetaEngine::AssetLoader::AssetFilePtr ZetaEngine::AssetLoader::OpenFile(const char* name, AssetOpenMode mode)
+AssetLoader::AssetFilePtr AssetLoader::OpenFile(const char* name, AssetOpenMode mode)
 {
     FILE *fp = nullptr;
     // loop N times up the hierarchy, testing at each level
@@ -75,9 +77,8 @@ ZetaEngine::AssetLoader::AssetFilePtr ZetaEngine::AssetLoader::OpenFile(const ch
                 looping = false;
             }
             fullPath.append(name);
-#ifdef DEBUG
             fprintf(stderr, "Trying to open %s\n", fullPath.c_str());
-#endif
+
             switch(mode) {
                 case ZetaEngine_OPEN_TEXT:
                 fp = fopen(fullPath.c_str(), "r");
@@ -97,7 +98,7 @@ ZetaEngine::AssetLoader::AssetFilePtr ZetaEngine::AssetLoader::OpenFile(const ch
     return nullptr;
 }
 
-ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadText(const char *filePath)
+Buffer AssetLoader::SyncOpenAndReadText(const char *filePath)
 {
     AssetFilePtr fp = OpenFile(filePath, ZetaEngine_OPEN_TEXT);
     Buffer* pBuff = nullptr;
@@ -107,6 +108,10 @@ ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadText(const char *file
 
         pBuff = new Buffer(length + 1);
         length = fread(pBuff->GetData(), 1, length, static_cast<FILE*>(fp));
+#ifdef DEBUG
+        fprintf(stderr, "Read file '%s', %zu bytes\n", filePath, length);
+#endif
+
         pBuff->GetData()[length] = '\0';
 
         CloseFile(fp);
@@ -115,14 +120,10 @@ ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadText(const char *file
         pBuff = new Buffer();
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "Read file '%s', %d bytes\n", filePath, length);
-#endif
-
     return *pBuff;
 }
 
-ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadBinary(const char *filePath)
+Buffer AssetLoader::SyncOpenAndReadBinary(const char *filePath)
 {
     AssetFilePtr fp = OpenFile(filePath, ZetaEngine_OPEN_BINARY);
     Buffer* pBuff = nullptr;
@@ -132,6 +133,9 @@ ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadBinary(const char *fi
 
         pBuff = new Buffer(length);
         fread(pBuff->GetData(), length, 1, static_cast<FILE*>(fp));
+#ifdef DEBUG
+        fprintf(stderr, "Read file '%s', %zu bytes\n", filePath, length);
+#endif
 
         CloseFile(fp);
     } else {
@@ -139,20 +143,17 @@ ZetaEngine::Buffer ZetaEngine::AssetLoader::SyncOpenAndReadBinary(const char *fi
         pBuff = new Buffer();
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "Read file '%s', %d bytes\n", filePath, length);
-#endif
 
     return *pBuff;
 }
 
-void ZetaEngine::AssetLoader::CloseFile(AssetFilePtr& fp)
+void AssetLoader::CloseFile(AssetFilePtr& fp)
 {
     fclose((FILE*)fp);
     fp = nullptr;
 }
 
-size_t ZetaEngine::AssetLoader::GetSize(const AssetFilePtr& fp)
+size_t AssetLoader::GetSize(const AssetFilePtr& fp)
 {
     FILE* _fp = static_cast<FILE*>(fp);
 
@@ -164,7 +165,7 @@ size_t ZetaEngine::AssetLoader::GetSize(const AssetFilePtr& fp)
     return length;
 }
 
-size_t ZetaEngine::AssetLoader::SyncRead(const AssetFilePtr& fp, Buffer& buf)
+size_t AssetLoader::SyncRead(const AssetFilePtr& fp, Buffer& buf)
 {
     size_t sz;
 
@@ -179,7 +180,7 @@ size_t ZetaEngine::AssetLoader::SyncRead(const AssetFilePtr& fp, Buffer& buf)
     return sz;
 }
 
-int32_t ZetaEngine::AssetLoader::Seek(AssetFilePtr fp, long offset, AssetSeekBase where)
+int32_t AssetLoader::Seek(AssetFilePtr fp, long offset, AssetSeekBase where)
 {
     return fseek(static_cast<FILE*>(fp), offset, static_cast<int>(where));
 }

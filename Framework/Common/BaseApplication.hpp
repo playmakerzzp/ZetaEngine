@@ -5,6 +5,8 @@
 #include "AssetLoader.hpp"
 #include "SceneManager.hpp"
 #include "InputManager.hpp"
+#include "PhysicsManager.hpp"
+#include "GameLogic.hpp"
 
 namespace ZetaEngine {
     class BaseApplication : implements IApplication

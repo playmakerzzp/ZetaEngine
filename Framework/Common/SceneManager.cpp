@@ -13,7 +13,7 @@ int SceneManager::Initialize()
 {
     int result = 0;
 
-    m_pScene = make_unique<Scene>();
+    m_pScene = make_shared<Scene>();
     return result;
 }
 
@@ -38,6 +38,11 @@ int SceneManager::LoadScene(const char* scene_file_name)
     }
 }
 
+void SceneManager::ResetScene()
+{
+    m_bDirtyFlag = true;
+}
+
 bool SceneManager::LoadOgexScene(const char* ogex_scene_file_name)
 {
     string ogex_text = g_pAssetLoader->SyncOpenAndReadTextFileToString(ogex_scene_file_name);
@@ -58,7 +63,6 @@ bool SceneManager::LoadOgexScene(const char* ogex_scene_file_name)
 
 const Scene& SceneManager::GetSceneForRendering()
 {
-    m_bDirtyFlag = false;
     return *m_pScene;
 }
 
@@ -67,4 +71,21 @@ bool SceneManager::IsSceneChanged()
     return m_bDirtyFlag;
 }
 
+void SceneManager::NotifySceneIsRenderingQueued()
+{
+    m_bDirtyFlag = false;
+}
 
+weak_ptr<SceneGeometryNode> SceneManager::GetSceneGeometryNode(string name)
+{
+    auto it = m_pScene->LUT_Name_GeometryNode.find(name);
+    if (it != m_pScene->LUT_Name_GeometryNode.end())
+        return it->second;
+    else
+        return weak_ptr<SceneGeometryNode>();
+}
+
+weak_ptr<SceneObjectGeometry> SceneManager::GetSceneGeometryObject(string key)
+{
+    return m_pScene->Geometries.find(key)->second;
+}

@@ -17,9 +17,6 @@ namespace ZetaEngine
 			virtual void Clear();
 			virtual void Draw();
 
-			void WorldRotateX(float radians);
-			void WorldRotateY(float radians);
-		
 		protected:
 			bool SetPerFrameShaderParameters();
 			bool SetPerBatchShaderParameters(const char* paramName, const Matrix4X4f& param);
