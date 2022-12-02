@@ -13,3 +13,6 @@
 [submodule "External/src/crossguid"]
 	path = External/src/crossguid
 	url = https://github.com/netwarm007/crossguid
+[submodule "External/src/bullet"]
+	path = External/src/bullet
+	url = git@github.com:netwarm007/bullet3.git
