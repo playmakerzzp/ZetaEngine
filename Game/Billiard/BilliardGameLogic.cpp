@@ -1,7 +1,8 @@
 #include <iostream>
 #include "BilliardGameLogic.hpp"
+#include "GraphicsManager.hpp"
 #include "SceneManager.hpp"
-#include "PhysicsManager.hpp"
+#include "IPhysicsManager.hpp"
 
 using namespace ZetaEngine;
 using namespace std;
@@ -10,8 +11,8 @@ int BilliardGameLogic::Initialize()
 {
     int result;
 
-    cout << "Biiliard Game Logic Initialize" << endl;
-    cout << "Start Loading Game Scene" << endl;
+    cout << "[BilliardGameLogic] Biiliard Game Logic Initialize" << endl;
+    cout << "[BilliardGameLogic] Start Loading Game Scene" << endl;
     result = g_pSceneManager->LoadScene("Scene/billiard.ogex");
 
     return result;
@@ -29,12 +30,14 @@ void BilliardGameLogic::Tick()
 
 void BilliardGameLogic::OnLeftKey()
 {
+    
     auto ptr = g_pSceneManager->GetSceneGeometryNode("pbb_cue");
     if (auto node = ptr.lock())
     {
         auto rigidBody = node->RigidBody();
         if (rigidBody)
         {
+            
             g_pPhysicsManager->ApplyCentralForce(rigidBody, Vector3f(-100.0f, 0.0f, 0.0f));
         }
     }

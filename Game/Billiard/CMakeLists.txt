@@ -9,6 +9,7 @@ add_executable(BilliardGame
     BilliardGameLogic.cpp BilliardGameConfig.cpp)
 ENDIF(ANDROID)
 target_link_libraries(BilliardGame 
+                        BulletPhysics
                         ZetaGameEngine
                      )
 # IF(WIN32)
