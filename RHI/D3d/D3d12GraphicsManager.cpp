@@ -783,20 +783,32 @@ HRESULT D3d12GraphicsManager::CreateGraphicsResources()
     }
     cout << "Done!" << endl;
 
+    cout << "Creating Depth Stencil Buffer ...";
+	if (FAILED(hr = CreateDepthStencil())) {
+		return hr;
+	}
+    cout << "Done!" << endl;
+
+    cout << "Creating Constant Buffer ...";
+	if (FAILED(hr = CreateConstantBuffer())) {
+		return hr;
+	}
+    cout << "Done!" << endl;
+
+    cout << "Creating Texture Buffer ...";
+	if (FAILED(hr = CreateTextureBuffer())) {
+		return hr;
+	}
+    cout << "Done!" << endl;
+
+    cout << "Creating Sampler Buffer ...";
+	if (FAILED(hr = CreateSamplerBuffer())) {
+		return hr;
+	}
+    cout << "Done!" << endl;
+
     cout << "Creating Root Signatures ...";
     if (FAILED(hr = CreateRootSignature())) {
-        return hr;
-    }
-    cout << "Done!" << endl;
-
-    cout << "Loading Shaders ...";
-    if (FAILED(hr = InitializeShader("Shaders/simple.hlsl.vs", "Shaders/simple.hlsl.ps"))) {
-        return hr;
-    }
-    cout << "Done!" << endl;
-
-    cout << "Initialize Buffers ...";
-    if (FAILED(hr = InitializeBuffers())) {
         return hr;
     }
     cout << "Done!" << endl;
@@ -862,8 +874,10 @@ HRESULT D3d12GraphicsManager::CreateRootSignature()
 
 
 // this is the function that loads and prepares the shaders
-HRESULT D3d12GraphicsManager::InitializeShader(const char* vsFilename, const char* fsFilename) {
+bool D3d12GraphicsManager::InitializeShaders() {
     HRESULT hr = S_OK;
+    const char* vsFilename = "Shaders/simple.hlsl.vs"; 
+    const char* fsFilename = "Shaders/simple.hlsl.ps";
 
     // load the shaders
     Buffer vertexShader = g_pAssetLoader->SyncOpenAndReadBinary(vsFilename);
@@ -937,39 +951,25 @@ HRESULT D3d12GraphicsManager::InitializeShader(const char* vsFilename, const cha
 
     if (FAILED(hr = m_pDev->CreateGraphicsPipelineState(&psod, IID_PPV_ARGS(&m_pPipelineState))))
     {
-        return hr;
+        return false;
     }
 
-    hr = m_pDev->CreateCommandList(0, 
+    if (FAILED(hr = m_pDev->CreateCommandList(0, 
                 D3D12_COMMAND_LIST_TYPE_DIRECT, 
                 m_pCommandAllocator, 
                 m_pPipelineState, 
-                IID_PPV_ARGS(&m_pCommandList));
+                IID_PPV_ARGS(&m_pCommandList))))
+    {
+        return false;
+    }
 
-    return hr;
+    return true;
 }
 
-HRESULT D3d12GraphicsManager::InitializeBuffers()
+void D3d12GraphicsManager::InitializeBuffers(const Scene& scene)
 {
     HRESULT hr = S_OK;
 
-	if (FAILED(hr = CreateDepthStencil())) {
-		return hr;
-	}
-
-	if (FAILED(hr = CreateConstantBuffer())) {
-		return hr;
-	}
-
-	if (FAILED(hr = CreateTextureBuffer())) {
-		return hr;
-	}
-
-	if (FAILED(hr = CreateSamplerBuffer())) {
-		return hr;
-	}
-
-    auto& scene = g_pSceneManager->GetSceneForRendering();
 	int32_t n = 0;
     for (auto _it : scene.GeometryNodes)
     {
@@ -1018,7 +1018,7 @@ HRESULT D3d12GraphicsManager::InitializeBuffers()
 
         if (FAILED(hr = m_pDev->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence))))
         {
-            return hr;
+            return;
         }
 
         m_nFenceValue = 1;
@@ -1028,13 +1028,13 @@ HRESULT D3d12GraphicsManager::InitializeBuffers()
         {
             hr = HRESULT_FROM_WIN32(GetLastError());
             if (FAILED(hr))
-                return hr;
+                return;
         }
 
         WaitForPreviousFrame();
     }
 
-    return hr;
+    return;
 }
 
 int  D3d12GraphicsManager::Initialize()
@@ -1052,7 +1052,7 @@ int  D3d12GraphicsManager::Initialize()
     return result;
 }
 
-void D3d12GraphicsManager::Finalize()
+void D3d12GraphicsManager::ClearBuffers()
 {
 	WaitForPreviousFrame();
 
@@ -1061,8 +1061,14 @@ void D3d12GraphicsManager::Finalize()
         SafeRelease(&p);
     }
     m_Buffers.clear();
-    SafeRelease(&m_pCommandList);
     SafeRelease(&m_pPipelineState);
+}
+
+void D3d12GraphicsManager::Finalize()
+{
+    ClearBuffers();
+
+    SafeRelease(&m_pCommandList);
     SafeRelease(&m_pRtvHeap);
     SafeRelease(&m_pDsvHeap);
     SafeRelease(&m_pCbvHeap);
@@ -1192,7 +1198,7 @@ HRESULT D3d12GraphicsManager::PopulateCommandList()
     return hr;
 }
 
-HRESULT D3d12GraphicsManager::RenderBuffers()
+void D3d12GraphicsManager::RenderBuffers()
 {
     HRESULT hr;
 
@@ -1203,7 +1209,7 @@ HRESULT D3d12GraphicsManager::RenderBuffers()
     // swap the back buffer and the front buffer
     hr = m_pSwapChain->Present(1, 0);
 
-    return hr;
+    (void)hr;
 }
 
 bool D3d12GraphicsManager::SetPerFrameShaderParameters()
