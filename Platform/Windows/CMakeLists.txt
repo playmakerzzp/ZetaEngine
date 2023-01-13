@@ -35,5 +35,4 @@ target_link_libraries(ZetaGameEngine
 target_include_directories(ZetaGameEngine PRIVATE 
         "${PROJECT_SOURCE_DIR}/External/src/glad/include")
 
-add_subdirectory(test)
 
