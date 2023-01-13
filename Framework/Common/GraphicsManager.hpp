@@ -1,48 +1,52 @@
 #pragma once
-#include "Image.hpp"
 #include "IRuntimeModule.hpp"
+#include "geommath.hpp"
+#include "Image.hpp"
+#include "Scene.hpp"
 
-namespace ZetaEngine
-{
-	class GraphicsManager : implements IRuntimeModule
-	{
-		public:
-			virtual ~GraphicsManager() override {}
+namespace ZetaEngine {
+    class GraphicsManager : implements IRuntimeModule
+    {
+    public:
+        virtual ~GraphicsManager() {}
 
-			virtual int Initialize() override;
-			virtual void Finalize() override;
+        virtual int Initialize();
+        virtual void Finalize();
 
-			virtual void Tick() override;
+        virtual void Tick();
 
-			virtual void Clear();
-			virtual void Draw();
+        virtual void Clear();
+        virtual void Draw();
 
-		protected:
-			bool SetPerFrameShaderParameters();
-			bool SetPerBatchShaderParameters(const char* paramName, const Matrix4X4f& param);
-			bool SetPerBatchShaderParameters(const char* paramName, const Vector3f& param);
-			bool SetPerBatchShaderParameters(const char* paramName, const float param);
-			bool SetPerBatchShaderParameters(const char* paramName, const int param);
+#ifdef DEBUG
+        virtual void DrawLine(const Vector3f &from, const Vector3f &to, const Vector3f &color);
+        virtual void DrawBox(const Vector3f &bbMin, const Vector3f &bbMax, const Vector3f &color);
+        virtual void ClearDebugBuffers();
+#endif
 
-			void InitConstants();
-			bool InitializeShader(const char* vsFilename, const char* fsFilename);
-			void InitializeBuffers();
-			void CalculateCameraMatrix();
-			void CalculateLights();
-			void RenderBuffers();
-		
-		protected:
-			struct DrawFrameContext 
-			{
-				Matrix4X4f  m_worldMatrix;
-				Matrix4X4f  m_viewMatrix;
-				Matrix4X4f  m_projectionMatrix;
-				Vector3f    m_lightPosition;
-				Vector4f    m_lightColor;
-        	};
+    protected:
+        virtual bool InitializeShaders();
+        virtual void ClearShaders();
+        virtual void InitializeBuffers(const Scene& scene);
+        virtual void ClearBuffers();
 
-        	DrawFrameContext    m_DrawFrameContext;
-	};
+        virtual void InitConstants();
+        virtual void CalculateCameraMatrix();
+        virtual void CalculateLights();
+        virtual void RenderBuffers();
 
-	extern GraphicsManager* g_pGraphicsManager;
+    protected:
+        struct DrawFrameContext {
+            Matrix4X4f  m_worldMatrix;
+            Matrix4X4f  m_viewMatrix;
+            Matrix4X4f  m_projectionMatrix;
+            Vector3f    m_lightPosition;
+            Vector4f    m_lightColor;
+        };
+
+        DrawFrameContext    m_DrawFrameContext;
+    };
+
+    extern GraphicsManager* g_pGraphicsManager;
 }
+
