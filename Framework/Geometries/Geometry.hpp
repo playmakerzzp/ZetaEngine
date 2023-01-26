@@ -11,7 +11,8 @@ namespace ZetaEngine {
         kCone,
         kPlane,
         kCapsule,
-        kTriangle
+        kTriangle,
+        kPolyhydron
     };
 
     class Geometry 

@@ -9,6 +9,7 @@ namespace ZetaEngine {
             virtual void Finalize();
             virtual void Tick();
 
+            // keyboard handling
             void UpArrowKeyDown();
             void UpArrowKeyUp();
             void DownArrowKeyDown();
@@ -18,13 +19,18 @@ namespace ZetaEngine {
             void RightArrowKeyDown();
             void RightArrowKeyUp();
 
-            void ResetKeyDown();
-            void ResetKeyUp();
-        
+            void AsciiKeyDown(char keycode);
+            void AsciiKeyUp(char keycode);
+
+            // mouse handling
+            void LeftMouseButtonDown();
+            void LeftMouseButtonUp();
+            void LeftMouseDrag(float deltaX, float deltaY);
+
         protected:
-            bool m_bUpKeyPressed = false;
-            bool m_bDownKeyPressed = false;
-            bool m_bLeftKeyPressed = false;
+            bool m_bUpKeyPressed    = false;
+            bool m_bDownKeyPressed  = false;
+            bool m_bLeftKeyPressed  = false;
             bool m_bRightKeyPressed = false;
     };
 

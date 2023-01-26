@@ -1,9 +1,14 @@
 #pragma once
+#include <algorithm>
+#include <cassert>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <limits>
-#include <math.h>
-#include <cstring>
+#include <cmath>
+#include <memory>
+#include <set>
+#include <vector>
 #include "CrossProduct.h"
 #include "MulByElement.h"
 #include "Normalize.h"
@@ -733,5 +738,77 @@ namespace ZetaEngine {
         ispc::IDCT8X8(matrix, result);
         return result;
     }
+
+    typedef Vector3Type<float> Point;
+    typedef std::shared_ptr<Point> PointPtr;
+    typedef std::set<PointPtr> PointSet;
+    typedef std::vector<PointPtr> PointList;
+    typedef std::pair<PointPtr, PointPtr> Edge;
+    inline bool operator==(const Edge& a, const Edge& b)
+    {
+        return (a.first == b.first && a.second == b.second) || (a.first == b.second && a.second == b.first);
+    }
+    typedef std::shared_ptr<Edge> EdgePtr;
+    inline bool operator==(const EdgePtr& a, const EdgePtr& b)
+    {
+        return (a->first == b->first && a->second == b->second) || (a->first == b->second && a->second == b->first);
+    }
+    typedef std::set<EdgePtr> EdgeSet;
+    typedef std::vector<EdgePtr> EdgeList;
+    struct Face {
+        EdgeList    Edges;
+        Vector3f    Normal;
+        PointList GetVertices() const 
+        {
+            PointList vertices;
+            for (auto edge : Edges)
+            {
+                vertices.push_back(edge->first);
+            }
+
+            return vertices;
+        }
+    };
+    typedef std::shared_ptr<Face> FacePtr;
+    typedef std::set<FacePtr> FaceSet;
+    typedef std::vector<FacePtr> FaceList;
+
+    inline bool isPointAbovePlane(const PointList& vertices, const Point& point)
+    {
+        auto count = vertices.size();
+        assert(count > 2);
+        auto ab = *vertices[1] - *vertices[0];
+        auto ac = *vertices[2] - *vertices[0];
+        Vector3f normal;
+        float cos_theta;
+        CrossProduct(normal, ab, ac);
+        auto dir = point - *vertices[0];
+        DotProduct(cos_theta, normal, dir);
+
+        return cos_theta > 0;
+    }
+
+    inline bool isPointAbovePlane(const FacePtr& pface, const Point& point)
+    {
+        assert(pface->Edges.size() > 2);
+        PointList vertices = {pface->Edges[0]->first, pface->Edges[1]->first, pface->Edges[2]->first};
+        return isPointAbovePlane(vertices, point);
+    }
+
+    inline float PointToPlaneDistance(const PointList& vertices, const PointPtr& point_ptr)
+    {
+        Vector3f normal;
+        float distance;
+        auto A = vertices[0];
+        auto B = vertices[1];
+        auto C = vertices[2];
+        CrossProduct(normal, *B - *A, *C - *A);
+        Normalize(normal);
+        DotProduct(distance, normal, *point_ptr - *A);
+        distance = std::abs(distance);
+
+        return distance;
+    }
+
 }
 
