@@ -1,4 +1,5 @@
 #pragma once
+#ifdef DEBUG
 #include "IRuntimeModule.hpp"
 
 namespace ZetaEngine {
@@ -14,8 +15,13 @@ namespace ZetaEngine {
         void DrawDebugInfo();
 
     protected:
+        void DrawAxis();
+        void DrawGrid();
+
         bool m_bDrawDebugInfo = false;
     };
 
     extern DebugManager* g_pDebugManager;
 }
+
+#endif
