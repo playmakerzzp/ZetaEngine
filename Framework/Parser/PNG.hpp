@@ -52,7 +52,7 @@ namespace ZetaEngine {
     };
 
     struct PNG_PLTE_HEADER : PNG_CHUNK_HEADER {
-        Vector3Type<uint8_t>* pEntries;
+        Vector<uint8_t, 3>* pEntries;
     };
 #pragma pack(pop)
 
@@ -189,13 +189,13 @@ namespace ZetaEngine {
                             {
                                 std::cout << "PLTE (Palette)" << std::endl;
                                 std::cout << "----------------------------" << std::endl;
+#if DUMP_DETAILS
                                 const PNG_PLTE_HEADER* pPLTEHeader = reinterpret_cast<const PNG_PLTE_HEADER*>(pData);
                                 for (auto i = 0; i < chunk_data_size / sizeof(*pPLTEHeader->pEntries); i++)
                                 {
-#if DUMP_DETAILS
                                     std::cout << "Entry " << i << ": " << pPLTEHeader->pEntries[i] << std::endl;
-#endif
                                 }
+#endif
                             }
                             break;
                         case PNG_CHUNK_TYPE::IDAT:
