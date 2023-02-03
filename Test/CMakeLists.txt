@@ -36,12 +36,20 @@ target_link_libraries(SceneLoadingTest Common)
 __add_xg_platform_dependencies(SceneLoadingTest)
 add_test(NAME TEST_SceneLoading COMMAND SceneLoadingTest)
 
+
+add_executable(AnimationTest AnimationTest.cpp)
+target_link_libraries(AnimationTest Common)
+add_test(NAME TEST_Animation COMMAND AnimationTest)
+
 add_executable(BulletTest BulletTest.cpp)
 target_link_libraries(BulletTest ${BULLET_DYNAMICS_LIBRARY} ${BULLET_COLLISION_LIBRARY} ${BULLET_LINEARMATH_LIBRARY})
 add_test(NAME TEST_Bullet COMMAND BulletTest)
 
 add_executable(NumericalMethodsTest NumericalMethodsTest.cpp)
 add_test(NAME TEST_NumericalMethods COMMAND NumericalMethodsTest)
+
+add_executable(BezierCubic1DTest BezierCubic1DTest.cpp)
+add_test(NAME TEST_BezierCubic1D COMMAND BezierCubic1DTest)
 
 add_executable(QuickhullTest QuickhullTest.cpp)
 target_link_libraries(QuickhullTest Algorism Geometries GeomMath)
@@ -50,3 +58,6 @@ add_test(NAME TEST_Quickhull COMMAND QuickhullTest)
 add_executable(GjkTest GjkTest.cpp)
 target_link_libraries(GjkTest Algorism Geometries GeomMath)
 add_test(NAME TEST_Gjk COMMAND GjkTest)
+
+add_executable(ChronoTest ChronoTest.cpp)
+add_test(NAME TEST_Chrono COMMAND ChronoTest)
