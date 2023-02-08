@@ -21,6 +21,8 @@ namespace ZetaEngine {
 
         void ApplyCentralForce(void* rigidBody, Vector3f force);
 
+        void IterateConvexHull();
+
 #ifdef DEBUG
 	    void DrawDebugInfo();
 #endif
