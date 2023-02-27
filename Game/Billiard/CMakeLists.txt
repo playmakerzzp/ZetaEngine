@@ -10,7 +10,7 @@ add_executable(BilliardGame
 ENDIF(ANDROID)
 target_link_libraries(BilliardGame 
                         BulletPhysics
-                        ZetaGameEngineOpenGL
+                        ZetaGameEngineD3d12
                      )
 # IF(WIN32)
 # add_custom_command(TARGET BilliardGame POST_BUILD
