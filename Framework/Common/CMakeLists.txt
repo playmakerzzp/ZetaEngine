@@ -1,8 +1,8 @@
 add_library(Common
 AnimationManager.cpp
-Allocator.cpp
 AssetLoader.cpp
 BaseApplication.cpp
+BlockAllocator.cpp
 DebugManager.cpp
 GraphicsManager.cpp
 InputManager.cpp
@@ -11,6 +11,7 @@ MemoryManager.cpp
 Scene.cpp
 SceneManager.cpp
 SceneObject.cpp
+StackAllocator.cpp
 SceneObjectAnimation.cpp
 SceneObjectMesh.cpp
 SceneObjectTrack.cpp

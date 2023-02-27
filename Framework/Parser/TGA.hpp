@@ -72,12 +72,12 @@ namespace ZetaEngine {
             img.pitch = (img.Width * (img.bitcount >> 3) + 3) & ~3u; // for GPU address alignment
 
             img.data_size = img.pitch * img.Height;
-            img.data = g_pMemoryManager->Allocate(img.data_size);
+            img.data = new uint8_t[img.data_size];
 
             uint8_t* pOut = (uint8_t*)img.data;
-            for (auto i = 0; i < img.Height; i++)
+            for (decltype(img.Height) i = 0; i < img.Height; i++)
             {
-                for (auto j = 0; j < img.Width; j++)
+                for (decltype(img.Width) j = 0; j < img.Width; j++)
                 {
                     switch(pixel_depth)
                     {

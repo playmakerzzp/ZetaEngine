@@ -1,40 +1,41 @@
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include "Allocator.hpp"
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include "BlockAllocator.hpp"
+#include "MemoryManager.hpp"
 
 #ifndef ALIGN
 #define ALIGN(x, a)         (((x) + ((a) - 1)) & ~((a) - 1))
 #endif
 
 using namespace ZetaEngine;
+using namespace std;
 
-ZetaEngine::Allocator::Allocator()
+BlockAllocator::BlockAllocator()
         : m_pPageList(nullptr), m_pFreeList(nullptr), 
-        m_szDataSize(0), m_szPageSize(0), 
+        m_szPageSize(0), 
         m_szAlignmentSize(0), m_szBlockSize(0), m_nBlocksPerPage(0) 
 {
 }
 
-ZetaEngine::Allocator::Allocator(size_t data_size, size_t page_size, size_t alignment)
+BlockAllocator::BlockAllocator(size_t data_size, size_t page_size, size_t alignment)
         : m_pPageList(nullptr), m_pFreeList(nullptr)
 {
     Reset(data_size, page_size, alignment);
 }
 
-ZetaEngine::Allocator::~Allocator()
+BlockAllocator::~BlockAllocator()
 {
     FreeAll();
 }
 
-void ZetaEngine::Allocator::Reset(size_t data_size, size_t page_size, size_t alignment)
+void BlockAllocator::Reset(size_t data_size, size_t page_size, size_t alignment)
 {
     FreeAll();
 
-    m_szDataSize = data_size;
     m_szPageSize = page_size;
 
-    size_t minimal_size = (sizeof(BlockHeader) > m_szDataSize) ? sizeof(BlockHeader) : m_szDataSize;
+    size_t minimal_size = (sizeof(BlockHeader) > data_size) ? sizeof(BlockHeader) : data_size;
     // this magic only works when alignment is 2^n, which should general be the case
     // because most CPU/GPU also requires the aligment be in 2^n
     // but still we use a assert to guarantee it
@@ -48,11 +49,17 @@ void ZetaEngine::Allocator::Reset(size_t data_size, size_t page_size, size_t ali
     m_nBlocksPerPage = (m_szPageSize - sizeof(PageHeader)) / m_szBlockSize;
 }
 
-void* ZetaEngine::Allocator::Allocate()
+void* BlockAllocator::Allocate(size_t size)
+{
+    assert(size <= m_szBlockSize);
+    return Allocate();
+}
+
+void* BlockAllocator::Allocate()
 {
     if (!m_pFreeList) {
         // allocate a new page
-        PageHeader* pNewPage = reinterpret_cast<PageHeader*>(new uint8_t[m_szPageSize]);
+        PageHeader* pNewPage = reinterpret_cast<PageHeader*>(g_pMemoryManager->AllocatePage(m_szPageSize));
         ++m_nPages;
         m_nBlocks += m_nBlocksPerPage;
         m_nFreeBlocks += m_nBlocksPerPage;
@@ -63,13 +70,15 @@ void* ZetaEngine::Allocator::Allocate()
 
         if (m_pPageList) {
             pNewPage->pNext = m_pPageList;
+        } else {
+            pNewPage->pNext = nullptr;
         }
 
         m_pPageList = pNewPage;
 
         BlockHeader* pBlock = pNewPage->Blocks();
         // link each block in the page
-        for (uint32_t i = 0; i < m_nBlocksPerPage; i++) {
+        for (uint32_t i = 0; i < m_nBlocksPerPage - 1; i++) {
             pBlock->pNext = NextBlock(pBlock);
             pBlock = NextBlock(pBlock);
         }
@@ -89,7 +98,7 @@ void* ZetaEngine::Allocator::Allocate()
     return reinterpret_cast<void*>(freeBlock);
 }
 
-void ZetaEngine::Allocator::Free(void* p)
+void BlockAllocator::Free(void* p)
 {
     BlockHeader* block = reinterpret_cast<BlockHeader*>(p);
 
@@ -102,14 +111,14 @@ void ZetaEngine::Allocator::Free(void* p)
     ++m_nFreeBlocks;
 }
 
-void ZetaEngine::Allocator::FreeAll()
+void BlockAllocator::FreeAll()
 {
     PageHeader* pPage = m_pPageList;
     while(pPage) {
         PageHeader* _p = pPage;
         pPage = pPage->pNext;
 
-        delete[] reinterpret_cast<uint8_t*>(_p);
+        g_pMemoryManager->FreePage(reinterpret_cast<void*>(_p));
     }
 
     m_pPageList = nullptr;
@@ -121,7 +130,7 @@ void ZetaEngine::Allocator::FreeAll()
 }
 
 #if defined(_DEBUG)
-void ZetaEngine::Allocator::FillFreePage(PageHeader *pPage)
+void BlockAllocator::FillFreePage(PageHeader *pPage)
 {
     // page header
     pPage->pNext = nullptr;
@@ -135,7 +144,7 @@ void ZetaEngine::Allocator::FillFreePage(PageHeader *pPage)
     }
 }
  
-void ZetaEngine::Allocator::FillFreeBlock(BlockHeader *pBlock)
+void BlockAllocator::FillFreeBlock(BlockHeader *pBlock)
 {
     // block header + data
     memset(pBlock, PATTERN_FREE, m_szBlockSize - m_szAlignmentSize);
@@ -145,7 +154,7 @@ void ZetaEngine::Allocator::FillFreeBlock(BlockHeader *pBlock)
                 PATTERN_ALIGN, m_szAlignmentSize);
 }
  
-void ZetaEngine::Allocator::FillAllocatedBlock(BlockHeader *pBlock)
+void BlockAllocator::FillAllocatedBlock(BlockHeader *pBlock)
 {
     // block header + data
     memset(pBlock, PATTERN_ALLOC, m_szBlockSize - m_szAlignmentSize);
@@ -157,7 +166,7 @@ void ZetaEngine::Allocator::FillAllocatedBlock(BlockHeader *pBlock)
  
 #endif
 
-ZetaEngine::BlockHeader* ZetaEngine::Allocator::NextBlock(BlockHeader *pBlock)
+ZetaEngine::BlockHeader* BlockAllocator::NextBlock(BlockHeader *pBlock)
 {
     return reinterpret_cast<BlockHeader *>(reinterpret_cast<uint8_t*>(pBlock) + m_szBlockSize);
 }

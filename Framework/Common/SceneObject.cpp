@@ -199,8 +199,6 @@ namespace ZetaEngine {
 	{
 		out << static_cast<const SceneObjectLight&>(obj) << endl;
 		out << "Light Type: Spot" << endl;
-		out << "Cone Angle: " << obj.m_fConeAngle << endl;
-		out << "Penumbra Angle: " << obj.m_fPenumbraAngle << endl;
 
 		return out;
 	}
