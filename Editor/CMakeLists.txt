@@ -17,7 +17,7 @@ IF(WIN32)
 ELSE(WIN32)
     target_link_libraries(Editor
                             MyPhysics
-                            ZetaGameEngine
+                            ZetaGameEngineOpenGL
                         )
 ENDIF(WIN32)
 
