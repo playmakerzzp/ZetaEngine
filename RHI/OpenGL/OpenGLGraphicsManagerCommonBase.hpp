@@ -6,19 +6,32 @@
 #include <memory>
 #include "GraphicsManager.hpp"
 #include "geommath.hpp"
-#include  <GLES3/gl32.h>
 #include "SceneManager.hpp"
+#include "IApplication.hpp"
+#include "IPhysicsManager.hpp"
 
 namespace ZetaEngine {
-    class OpenGLESGraphicsManager : public GraphicsManager
+    class OpenGLGraphicsManagerCommonBase : public GraphicsManager
     {
+    public:
         // overrides
-        int Initialize() final;
+        int Initialize() = 0;
         void Finalize() final;
 
         void Clear() final;
 
         void Draw() final;
+
+        void UseShaderProgram(const intptr_t shaderProgram) final;
+        void SetPerFrameConstants(const DrawFrameContext& context) final;
+        void DrawBatch(const DrawBatchContext& context) final;
+        void DrawBatchDepthOnly(const DrawBatchContext& context) final;
+
+        intptr_t GenerateShadowMapArray(uint32_t count) final;
+        void BeginShadowMap(const Light& light, const intptr_t shadowmap, uint32_t layer_index) final;
+        void EndShadowMap(const intptr_t shadowmap, uint32_t layer_index) final;
+        void SetShadowMap(const intptr_t shadowmap) final;
+        void DestroyShadowMap(intptr_t& shadowmap) final;
 
 #ifdef DEBUG
         void DrawPoint(const Point& point, const Vector3f& color) final;
@@ -31,43 +44,35 @@ namespace ZetaEngine {
         void DrawTriangle(const PointList& vertices, const Matrix4X4f& trans, const Vector3f& color) final;
         void DrawTriangleStrip(const PointList& vertices, const Vector3f& color) final;
         void ClearDebugBuffers() final;
+        void DrawOverlay(const intptr_t shadowmap, uint32_t layer_index, float vp_left, float vp_top, float vp_width, float vp_height) final;
         void RenderDebugBuffers();
 #endif
 
         void InitializeBuffers(const Scene& scene) final;
         void ClearBuffers() final;
-        bool InitializeShaders() final;
-        void ClearShaders() final;
-        void RenderBuffers() final;
 
     protected:
         void DrawPoints(const Point* buffer, const size_t count, const Matrix4X4f& trans, const Vector3f& color);
 
-        bool SetPerBatchShaderParameters(GLuint shader, const char* paramName, const Matrix4X4f& param);
-        bool SetPerBatchShaderParameters(GLuint shader, const char* paramName, const Vector3f& param);
-        bool SetPerBatchShaderParameters(GLuint shader, const char* paramName, const float param);
-        bool SetPerBatchShaderParameters(GLuint shader, const char* paramName, const int param);
-        bool SetPerBatchShaderParameters(GLuint shader, const char* paramName, const bool param);
-        bool SetPerFrameShaderParameters(GLuint shader);
+        bool SetShaderParameter(const char* paramName, const Matrix4X4f& param);
+        bool SetShaderParameter(const char* paramName, const Vector4f& param);
+        bool SetShaderParameter(const char* paramName, const Vector3f& param);
+        bool SetShaderParameter(const char* paramName, const Vector2f& param);
+        bool SetShaderParameter(const char* paramName, const float param);
+        bool SetShaderParameter(const char* paramName, const int param);
+        bool SetShaderParameter(const char* paramName, const bool param);
+        bool SetPerFrameShaderParameters(const DrawFrameContext& context);
 
     private:
-        GLuint m_vertexShader;
-        GLuint m_fragmentShader;
-        GLuint m_shaderProgram;
-#ifdef DEBUG
-        GLuint m_debugVertexShader;
-        GLuint m_debugFragmentShader;
-        GLuint m_debugShaderProgram;
-#endif
-        std::map<std::string, GLint> m_TextureIndex;
+        GLuint m_ShadowMapFramebufferName;
+        GLuint m_CurrentShader;
+        GLuint m_UboBuffer = 0;
 
-        struct DrawBatchContext {
+        struct OpenGLDrawBatchContext : public DrawBatchContext {
             GLuint  vao;
             GLenum  mode;
             GLenum  type;
             GLsizei count;
-            std::shared_ptr<SceneGeometryNode> node;
-            std::shared_ptr<SceneObjectMaterial> material;
         };
 
 #ifdef DEBUG
@@ -80,17 +85,13 @@ namespace ZetaEngine {
         };
 #endif
 
-        std::vector<DrawBatchContext> m_DrawBatchContext;
-
         std::vector<GLuint> m_Buffers;
         std::vector<GLuint> m_Textures;
+        std::map<std::string, GLint> m_TextureIndex;
 
 #ifdef DEBUG
         std::vector<DebugDrawBatchContext> m_DebugDrawBatchContext;
         std::vector<GLuint> m_DebugBuffers;
 #endif
     };
-
 }
-
-
