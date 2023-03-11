@@ -1,95 +1,43 @@
-#include "SceneObjectMesh.hpp"
+#pragma once
+#include <vector>
+#include "SceneObjectIndexArray.hpp"
+#include "SceneObjectVertexArray.hpp"
+#include "geommath.hpp"
+#include "BaseSceneObject.hpp"
+#include "ConvexHull.hpp"
+#include "SceneObjectTypeDef.hpp"
 
-using namespace ZetaEngine;
-using namespace std;
-
-BoundingBox SceneObjectMesh::GetBoundingBox() const
-{
-    Vector3f bbmin (numeric_limits<float>::max());
-    Vector3f bbmax (numeric_limits<float>::lowest());
-    auto count = m_VertexArray.size();
-    for (auto n = 0; n < count; n++)
+namespace ZetaEngine {
+    class SceneObjectMesh : public BaseSceneObject
     {
-        if (m_VertexArray[n].GetAttributeName() == "position")
-        {
-            auto data_type = m_VertexArray[n].GetDataType();
-            auto vertices_count = m_VertexArray[n].GetVertexCount();	
-            auto data = m_VertexArray[n].GetData();
-            for (auto i = 0; i < vertices_count; i++)
+        protected:
+            std::vector<SceneObjectIndexArray>  m_IndexArray;
+            std::vector<SceneObjectVertexArray> m_VertexArray;
+			PrimitiveType	m_PrimitiveType;
+
+        public:
+            SceneObjectMesh(bool visible = true, bool shadow = true, bool motion_blur = true) : BaseSceneObject(SceneObjectType::kSceneObjectTypeMesh) {};
+            SceneObjectMesh(SceneObjectMesh&& mesh)
+                : BaseSceneObject(SceneObjectType::kSceneObjectTypeMesh), 
+                m_IndexArray(std::move(mesh.m_IndexArray)),
+                m_VertexArray(std::move(mesh.m_VertexArray)),
+                m_PrimitiveType(mesh.m_PrimitiveType)
             {
-                switch(data_type) {
-                    case VertexDataType::kVertexDataTypeFloat3:
-                    {
-                        const Vector3f* vertex = reinterpret_cast<const Vector3f*>(data) + i;
-                        bbmin[0] = (bbmin[0] < vertex->data[0])? bbmin[0] : vertex->data[0];
-                        bbmin[1] = (bbmin[1] < vertex->data[1])? bbmin[1] : vertex->data[1];
-                        bbmin[2] = (bbmin[2] < vertex->data[2])? bbmin[2] : vertex->data[2];
-                        bbmax[0] = (bbmax[0] > vertex->data[0])? bbmax[0] : vertex->data[0];
-                        bbmax[1] = (bbmax[1] > vertex->data[1])? bbmax[1] : vertex->data[1];
-                        bbmax[2] = (bbmax[2] > vertex->data[2])? bbmax[2] : vertex->data[2];
-                        break;
-                    }
-                    case VertexDataType::kVertexDataTypeDouble3:
-                    {
-                        const Vector3* vertex = reinterpret_cast<const Vector3*>(data) + i;
-                        bbmin[0] = static_cast<float>((bbmin[0] < vertex->data[0])? bbmin[0] : vertex->data[0]);
-                        bbmin[1] = static_cast<float>((bbmin[1] < vertex->data[1])? bbmin[1] : vertex->data[1]);
-                        bbmin[2] = static_cast<float>((bbmin[2] < vertex->data[2])? bbmin[2] : vertex->data[2]);
-                        bbmax[0] = static_cast<float>((bbmax[0] > vertex->data[0])? bbmax[0] : vertex->data[0]);
-                        bbmax[1] = static_cast<float>((bbmax[1] > vertex->data[1])? bbmax[1] : vertex->data[1]);
-                        bbmax[2] = static_cast<float>((bbmax[2] > vertex->data[2])? bbmax[2] : vertex->data[2]);
-                        break;
-                    }
-                    default:
-                        assert(0);
-                }
-            }
-        }
-    }
+            };
+            void AddIndexArray(SceneObjectIndexArray&& array) { m_IndexArray.push_back(std::move(array)); };
+            void AddVertexArray(SceneObjectVertexArray&& array) { m_VertexArray.push_back(std::move(array)); };
+			void SetPrimitiveType(PrimitiveType type) { m_PrimitiveType = type;  };
 
-    BoundingBox result;
-    result.extent = (bbmax - bbmin) * 0.5f;
-    result.centroid = (bbmax + bbmin) * 0.5f;
+            size_t GetIndexGroupCount() const { return m_IndexArray.size(); };
+            size_t GetIndexCount(const size_t index) const { return (m_IndexArray.empty()? 0 : m_IndexArray[index].GetIndexCount()); };
+            size_t GetVertexCount() const { return (m_VertexArray.empty()? 0 : m_VertexArray[0].GetVertexCount()); };
+            uint32_t GetVertexPropertiesCount() const { return static_cast<uint32_t>(m_VertexArray.size()); }; 
+            const SceneObjectVertexArray& GetVertexPropertyArray(const size_t index) const { return m_VertexArray[index]; };
+            const SceneObjectIndexArray& GetIndexArray(const size_t index) const { return m_IndexArray[index]; };
+            const PrimitiveType& GetPrimitiveType() { return m_PrimitiveType; };
+            BoundingBox GetBoundingBox() const;
+            ConvexHull GetConvexHull() const;
 
-    return result;
-}
-
-ConvexHull SceneObjectMesh::GetConvexHull() const
-{
-    ConvexHull hull;
-
-    auto count = m_VertexArray.size();
-    for (auto n = 0; n < count; n++)
-    {
-        if (m_VertexArray[n].GetAttributeName() == "position")
-        {
-            auto data_type = m_VertexArray[n].GetDataType();
-            auto vertices_count = m_VertexArray[n].GetVertexCount();	
-            auto data = m_VertexArray[n].GetData();
-            for (auto i = 0; i < vertices_count; i++)
-            {
-                switch(data_type) {
-                    case VertexDataType::kVertexDataTypeFloat3:
-                    {
-                        const Vector3f* vertex = reinterpret_cast<const Vector3f*>(data) + i;
-                        hull.AddPoint(*vertex);
-                        break;
-                    }
-                    case VertexDataType::kVertexDataTypeDouble3:
-                    {
-                        const Vector3* vertex = reinterpret_cast<const Vector3*>(data) + i;
-                        hull.AddPoint(*vertex);
-                        break;
-                    }
-                    default:
-                        assert(0);
-                }
-            }
-        }
-    }
-
-    // calculate the convex hull
-    hull.Iterate();
-
-    return hull;
+        friend std::ostream& operator<<(std::ostream& out, const SceneObjectMesh& obj);
+    };
 }

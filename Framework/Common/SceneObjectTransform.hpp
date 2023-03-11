@@ -5,7 +5,7 @@
 
 namespace ZetaEngine {
     class SceneObjectTransform : public BaseSceneObject, 
-         Animatable<float>, Animatable<Vector3f>, Animatable<Quaternion<float>>, Animatable<Matrix4X4f>
+        implements Animatable<float>, Animatable<Vector3f>, Animatable<Quaternion<float>>, Animatable<Matrix4X4f>
     {
         protected:
             Matrix4X4f m_matrix;

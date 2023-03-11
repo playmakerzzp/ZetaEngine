@@ -3,10 +3,10 @@
 
 namespace ZetaEngine
 {
-    class ShadowMapPass: implements IDrawPass
+    class ShadowMapPass : implements IDrawPass
     {
-    public:
+     public:
         ~ShadowMapPass() = default;
-        void Draw(Frame& frame);
+        void Draw(Frame& frame) final;   
     };
 }

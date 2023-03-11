@@ -1,12 +1,13 @@
 #pragma once
 #include "IApplication.hpp"
+#include "IShaderManager.hpp"
+#include "IPhysicsManager.hpp"
+#include "IGameLogic.hpp"
 #include "GraphicsManager.hpp"
 #include "MemoryManager.hpp"
 #include "AssetLoader.hpp"
 #include "SceneManager.hpp"
 #include "InputManager.hpp"
-#include "IPhysicsManager.hpp"
-#include "IGameLogic.hpp"
 #include "DebugManager.hpp"
 #include "AnimationManager.hpp"
 
@@ -27,8 +28,6 @@ namespace ZetaEngine {
         bool IsQuit() const;
 
         inline const GfxConfiguration& GetConfiguration() const { return m_Config; };
-
-        void OnDraw() {};
 
     protected:
         // Flag if need quit the main loop of the application

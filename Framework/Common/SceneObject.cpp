@@ -211,6 +211,14 @@ namespace ZetaEngine {
 		return out;
 	}
 
+	ostream& operator<<(ostream& out, const SceneObjectAreaLight& obj)
+	{
+		out << static_cast<const SceneObjectLight&>(obj) << endl;
+		out << "Light Type: Area" << endl;
+
+		return out;
+	}
+
 	ostream& operator<<(ostream& out, const SceneObjectCamera& obj)
 	{
 		out << static_cast<const BaseSceneObject&>(obj) << endl;

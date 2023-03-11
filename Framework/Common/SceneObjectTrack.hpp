@@ -15,7 +15,7 @@ namespace ZetaEngine {
         kMatrix = "MATX"_i32
     };
 
-    class SceneObjectTrack : public BaseSceneObject, Animatable<float>
+    class SceneObjectTrack : public BaseSceneObject, implements Animatable<float>
     {
         private:
             std::shared_ptr<SceneObjectTransform> m_pTransform;

@@ -1,5 +1,4 @@
 #pragma once
-#include <unordered_map>
 #include <vector>
 #include "geommath.hpp"
 #include "Scene.hpp"
@@ -10,22 +9,26 @@ namespace ZetaEngine {
         Vector4f    m_lightPosition;
         Vector4f    m_lightColor;
         Vector4f    m_lightDirection;
+        Vector2f    m_lightSize;
         float       m_lightIntensity;
         AttenCurveType m_lightDistAttenCurveType;
         float       m_lightDistAttenCurveParams[5];
         AttenCurveType m_lightAngleAttenCurveType;
         float       m_lightAngleAttenCurveParams[5];
-        bool        m_bCastShadow;
+        bool        m_lightCastShadow;
+        int32_t     m_lightShadowMapIndex;
+        Matrix4X4f  m_lightVP;
 
         Light()
         {
             m_lightPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
             m_lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
             m_lightDirection = { 0.0f, 0.0f, -1.0f, 0.0f };
+            m_lightSize = { 0.0f, 0.0f };
             m_lightIntensity = 0.5f;
             m_lightDistAttenCurveType = AttenCurveType::kNone;
             m_lightAngleAttenCurveType = AttenCurveType::kNone;
-            m_bCastShadow = false;
+            m_lightShadowMapIndex = -1;
         }
     };
 
@@ -48,6 +51,13 @@ namespace ZetaEngine {
     struct Frame {
         DrawFrameContext frameContext;
         std::vector<std::shared_ptr<DrawBatchContext>> batchContexts;
-        std::unordered_map<xg::Guid, intptr_t> shadowMaps;
+        intptr_t shadowMap;
+        uint32_t shadowMapCount;
+
+        Frame ()
+        {
+            shadowMap = -1;
+            shadowMapCount = 0;
+        }
     };
 }

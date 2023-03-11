@@ -3,8 +3,7 @@
 
 #include "shader_base.h"
 
-namespace ZetaEngine
-{
+namespace ZetaEngine {
     struct BasicVertex
     {
         Vector3f m_Position;
@@ -15,12 +14,13 @@ namespace ZetaEngine
 
     unistruct Constants
     {
-        Matrix4X4f m_modelView;
-        Matrix4X4f m_modelViewProjection;
-        Vector4f   m_lightPosition;
-        Vector4f   m_lightColor;
-        Vector4f   m_ambientColor;
-        Vector4f   m_lightAttenuation;
+        Matrix4X4f       m_modelView;
+        Matrix4X4f       m_modelViewProjection;
+        Vector4f         m_lightPosition;
+        Vector4f         m_lightColor;
+        Vector4f         m_ambientColor;
+        Vector4f         m_lightAttenuation;
     };
 }
-#endif
+
+#endif // !__STDCBUFFER_H__

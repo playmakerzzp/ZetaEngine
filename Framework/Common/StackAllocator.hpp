@@ -2,11 +2,9 @@
 #include <cstdint>
 #include <list>
 #include <memory>
-#include <vcruntime.h>
 #include "IAllocator.hpp"
 
-namespace ZetaEngine
-{
+namespace ZetaEngine {
     class StackAllocator : implements IAllocator
     {
     public:
@@ -19,13 +17,13 @@ namespace ZetaEngine
 
         // alloc and free blocks
         void* Allocate(size_t size);
-        void Free(void* p);
-        void FreeAll();
-    
+        void  Free(void* p);
+        void  FreeAll();
+
     protected:
         std::list<uint8_t*> m_pPages;
         std::list<std::shared_ptr<void>> m_pAllocatedPointers;
-        off_t  m_StackTop;
+        int64_t m_StackTop;
         size_t m_MaxSize;
     };
 }

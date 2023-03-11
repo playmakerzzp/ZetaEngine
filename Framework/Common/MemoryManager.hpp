@@ -5,8 +5,7 @@
 #include "IMemoryManager.hpp"
 #include "portable.hpp"
 
-namespace ZetaEngine
-{
+namespace ZetaEngine {
     ENUM(MemoryType)
     {
         CPU = "CPU"_i32,
@@ -25,10 +24,10 @@ namespace ZetaEngine
         void Tick();
 
         void* AllocatePage(size_t size);
-        void FreePage(void* p);
-    
+        void  FreePage(void* p);
+
     protected:
-        struct MemoryAllocationInfo
+        struct MemoryAllocationInfo 
         {
             size_t PageSize;
             MemoryType PageMemoryType;
@@ -37,3 +36,4 @@ namespace ZetaEngine
         std::map<void*, MemoryAllocationInfo> m_mapMemoryAllocationInfo;
     };
 }
+

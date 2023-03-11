@@ -38,6 +38,11 @@ int BaseApplication::Initialize()
 		return ret;
 	}
 
+	if ((ret = g_pShaderManager->Initialize()) != 0) {
+        cerr << "Failed. err = " << ret;
+		return ret;
+	}
+
 	if ((ret = g_pInputManager->Initialize()) != 0) {
         cerr << "Failed. err = " << ret;
 		return ret;
@@ -47,6 +52,11 @@ int BaseApplication::Initialize()
         cerr << "Failed. err = " << ret;
 		return ret;
 	}
+
+    if ((ret = g_pAnimationManager->Initialize()) != 0) {
+        cerr << "Failed. err =" << ret;
+        return ret;
+    }
 
     if ((ret = g_pGameLogic->Initialize()) != 0) {
         cerr << "Failed. err =" << ret;
@@ -66,9 +76,15 @@ int BaseApplication::Initialize()
 // Finalize all sub modules and clean up all runtime temporary files.
 void BaseApplication::Finalize()
 {
-    g_pInputManager->Finalize();
-    g_pGraphicsManager->Finalize();
+#ifdef DEBUG
+    g_pDebugManager->Finalize();
+#endif
+    g_pGameLogic->Finalize();
+    g_pAnimationManager->Finalize();
     g_pPhysicsManager->Finalize();
+    g_pInputManager->Finalize();
+    g_pShaderManager->Finalize();
+    g_pGraphicsManager->Finalize();
     g_pSceneManager->Finalize();
     g_pAssetLoader->Finalize();
     g_pMemoryManager->Finalize();
@@ -83,6 +99,9 @@ void BaseApplication::Tick()
     g_pSceneManager->Tick();
     g_pInputManager->Tick();
     g_pPhysicsManager->Tick();
+    g_pAnimationManager->Tick();
+    g_pShaderManager->Tick();
+    g_pGameLogic->Tick();
     g_pGraphicsManager->Tick();
 #ifdef DEBUG
     g_pDebugManager->Tick();

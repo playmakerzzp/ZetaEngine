@@ -7,6 +7,6 @@ namespace ZetaEngine
     {
     public:
         ~ForwardRenderPass() = default;
-        void Draw(Frame& frame) final;
+        void Draw(Frame& frame) final;    
     };
-} 
+}

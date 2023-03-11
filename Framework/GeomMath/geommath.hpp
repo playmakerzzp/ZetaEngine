@@ -89,7 +89,7 @@ namespace ZetaEngine {
 
         void Set(const T* pval)
         {
-            memcpy(data, pval, sizeof(T) * N);
+            std::memcpy(data, pval, sizeof(T) * N);
         }
 
         void Set(std::initializer_list<const T> list)
@@ -115,7 +115,7 @@ namespace ZetaEngine {
 
         Vector& operator=(const Vector& v) 
         { 
-            memcpy(this, &v, sizeof(v));
+            std::memcpy(this, &v, sizeof(v));
             return *this;
         };
     };
@@ -205,8 +205,14 @@ namespace ZetaEngine {
         return result;
     }
 
-    template <typename T, int N>
-    inline void CrossProduct(Vector<T, N>& result, const Vector<T, N>& vec1, const Vector<T, N>& vec2)
+    template <typename T>
+    inline void CrossProduct(T& result, const Vector<T, 2>& vec1, const Vector<T, 2>& vec2)
+    {
+        result = vec1[0] * vec2[1] - vec1[1] * vec2[0];
+    }
+
+    template <typename T>
+    inline void CrossProduct(Vector<T, 3>& result, const Vector<T, 3>& vec1, const Vector<T, 3>& vec2)
     {
         ispc::CrossProduct(vec1, vec2, result);
     }
@@ -357,7 +363,7 @@ namespace ZetaEngine {
     {
         T result;
         DotProduct(result, vec, vec);
-        return static_cast<T>(sqrt(result));
+        return static_cast<T>(std::sqrt(result));
     }
 
     template <typename T, int N>
@@ -389,7 +395,7 @@ namespace ZetaEngine {
     {
         T length;
         DotProduct(length, static_cast<T*>(a), static_cast<T*>(a), N);
-        length = sqrt(length);
+        length = std::sqrt(length);
         ispc::Normalize(N, a, length);
     }
 
@@ -632,13 +638,13 @@ namespace ZetaEngine {
         float cYaw, cPitch, cRoll, sYaw, sPitch, sRoll;
 
         // Get the cosine and sin of the yaw, pitch, and roll.
-        cYaw = cosf(yaw);
-        cPitch = cosf(pitch);
-        cRoll = cosf(roll);
+        cYaw = std::cos(yaw);
+        cPitch = std::cos(pitch);
+        cRoll = std::cos(roll);
 
-        sYaw = sinf(yaw);
-        sPitch = sinf(pitch);
-        sRoll = sinf(roll);
+        sYaw = std::sin(yaw);
+        sPitch = std::sin(pitch);
+        sRoll = std::sin(roll);
 
         // Calculate the yaw, pitch, roll rotation matrix.
         matrix = {{
@@ -655,7 +661,7 @@ namespace ZetaEngine {
     {
 		Vector4f tmp ({vector[0], vector[1], vector[2], 1.0f});
         ispc::Transform(tmp, matrix);
-        memcpy(&vector, &tmp, sizeof(vector));
+        std::memcpy(&vector, &tmp, sizeof(vector));
     }
 
     inline void Transform(Vector4f& vector, const Matrix4X4f& matrix)
@@ -671,12 +677,45 @@ namespace ZetaEngine {
         ispc::MatrixExchangeYandZ(matrix, ROWS, COLS);
     }
 
-    inline void BuildViewMatrix(Matrix4X4f& result, const Vector3f position, const Vector3f lookAt, const Vector3f up)
+    inline void BuildViewLHMatrix(Matrix4X4f& result, const Vector3f position, const Vector3f lookAt, const Vector3f up)
     {
         Vector3f zAxis, xAxis, yAxis;
         float result1, result2, result3;
 
         zAxis = lookAt - position;
+        Normalize(zAxis);
+
+        CrossProduct(xAxis, up, zAxis);
+        Normalize(xAxis);
+
+        CrossProduct(yAxis, zAxis, xAxis);
+
+        DotProduct(result1, xAxis, position);
+        result1 = -result1;
+
+        DotProduct(result2, yAxis, position);
+        result2 = -result2;
+
+        DotProduct(result3, zAxis, position);
+        result3 = -result3;
+
+        // Set the computed values in the view matrix.
+        Matrix4X4f tmp = {{
+            { xAxis[0], yAxis[0], zAxis[0], 0.0f },
+            { xAxis[1], yAxis[1], zAxis[1], 0.0f },
+            { xAxis[2], yAxis[2], zAxis[2], 0.0f },
+            { result1, result2, result3, 1.0f }
+        }};
+
+        result = tmp;
+    }
+
+    inline void BuildViewRHMatrix(Matrix4X4f& result, const Vector3f position, const Vector3f lookAt, const Vector3f up)
+    {
+        Vector3f zAxis, xAxis, yAxis;
+        float result1, result2, result3;
+
+        zAxis = position - lookAt;
         Normalize(zAxis);
 
         CrossProduct(xAxis, up, zAxis);
@@ -714,8 +753,8 @@ namespace ZetaEngine {
     inline void BuildPerspectiveFovLHMatrix(Matrix4X4f& matrix, const float fieldOfView, const float screenAspect, const float screenNear, const float screenDepth)
     {
         Matrix4X4f perspective = {{
-            { 1.0f / (screenAspect * tanf(fieldOfView * 0.5f)), 0.0f, 0.0f, 0.0f },
-            { 0.0f, 1.0f / tanf(fieldOfView * 0.5f), 0.0f, 0.0f },
+            { 1.0f / (screenAspect * std::tan(fieldOfView * 0.5f)), 0.0f, 0.0f, 0.0f },
+            { 0.0f, 1.0f / std::tan(fieldOfView * 0.5f), 0.0f, 0.0f },
             { 0.0f, 0.0f, screenDepth / (screenDepth - screenNear), 1.0f },
             { 0.0f, 0.0f, (-screenNear * screenDepth) / (screenDepth - screenNear), 0.0f }
         }};
@@ -728,8 +767,8 @@ namespace ZetaEngine {
     inline void BuildPerspectiveFovRHMatrix(Matrix4X4f& matrix, const float fieldOfView, const float screenAspect, const float screenNear, const float screenDepth)
     {
         Matrix4X4f perspective = {{
-            { 1.0f / (screenAspect * tanf(fieldOfView * 0.5f)), 0.0f, 0.0f, 0.0f },
-            { 0.0f, 1.0f / tanf(fieldOfView * 0.5f), 0.0f, 0.0f },
+            { 1.0f / (screenAspect * std::tan(fieldOfView * 0.5f)), 0.0f, 0.0f, 0.0f },
+            { 0.0f, 1.0f / std::tan(fieldOfView * 0.5f), 0.0f, 0.0f },
             { 0.0f, 0.0f, screenDepth / (screenNear - screenDepth), -1.0f },
             { 0.0f, 0.0f, (-screenNear * screenDepth) / (screenDepth - screenNear), 0.0f }
         }};
@@ -766,32 +805,28 @@ namespace ZetaEngine {
 
     inline void MatrixRotationX(Matrix4X4f& matrix, const float angle)
     {
-        float c = cosf(angle), s = sinf(angle);
+        const float c = std::cos(angle), s = std::sin(angle);
 
-        Matrix4X4f rotation = {{
+        matrix = {{
             {  1.0f, 0.0f, 0.0f, 0.0f },
             {  0.0f,    c,    s, 0.0f },
             {  0.0f,   -s,    c, 0.0f },
             {  0.0f, 0.0f, 0.0f, 1.0f },
         }};
 
-        matrix = rotation;
-
         return;
     }
 
     inline void MatrixRotationY(Matrix4X4f& matrix, const float angle)
     {
-        float c = cosf(angle), s = sinf(angle);
+        const float c = std::cos(angle), s = std::sin(angle);
 
-        Matrix4X4f rotation = {{
+        matrix = {{
             {    c, 0.0f,   -s, 0.0f },
             { 0.0f, 1.0f, 0.0f, 0.0f },
             {    s, 0.0f,    c, 0.0f },
             { 0.0f, 0.0f, 0.0f, 1.0f },
         }};
-
-        matrix = rotation;
 
         return;
     }
@@ -799,23 +834,21 @@ namespace ZetaEngine {
 
     inline void MatrixRotationZ(Matrix4X4f& matrix, const float angle)
     {
-        float c = cosf(angle), s = sinf(angle);
+        const float c = std::cos(angle), s = std::sin(angle);
 
-        Matrix4X4f rotation = {{
+        matrix = {{
             {    c,    s, 0.0f, 0.0f },
             {   -s,    c, 0.0f, 0.0f },
             { 0.0f, 0.0f, 1.0f, 0.0f },
             { 0.0f, 0.0f, 0.0f, 1.0f }
         }};
 
-        matrix = rotation;
-
         return;
     }
 
     inline void MatrixRotationAxis(Matrix4X4f& matrix, const Vector3f& axis, const float angle)
     {
-        float c = cosf(angle), s = sinf(angle), one_minus_c = 1.0f - c;
+        float c = std::cos(angle), s = std::sin(angle), one_minus_c = 1.0f - c;
 
         Matrix4X4f rotation = {{
             {   c + axis[0] * axis[0] * one_minus_c,  axis[0] * axis[1] * one_minus_c + axis[2] * s, axis[0] * axis[2] * one_minus_c - axis[1] * s, 0.0f    },
@@ -889,6 +922,9 @@ namespace ZetaEngine {
         return result;
     }
 
+    typedef Vector<float, 2> Point2D;
+    typedef std::shared_ptr<Point2D> Point2DPtr;
+    typedef std::vector<Point2DPtr> Point2DList;
     typedef Vector<float, 3> Point;
     typedef std::shared_ptr<Point> PointPtr;
     typedef std::unordered_set<PointPtr> PointSet;

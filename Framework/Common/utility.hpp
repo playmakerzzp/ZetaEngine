@@ -1,13 +1,13 @@
-namespace ZetaEngine
-{
-    template<class T>
-    inline void SafeRelease(T **ppInterfaceToRelease)
-    {
-        if(*ppInterfaceToRelease != nullptr)
-        {
-            (*ppInterfaceToRelease)->Release();
+namespace ZetaEngine {
+	template<class T>
+	inline void SafeRelease(T **ppInterfaceToRelease)
+	{
+		if (*ppInterfaceToRelease != nullptr)
+		{
+			(*ppInterfaceToRelease)->Release();
 
-            (*ppInterfaceToRelease) = nullptr;
-        }
-    }
+			(*ppInterfaceToRelease) = nullptr;
+		}
+	}
 }
+

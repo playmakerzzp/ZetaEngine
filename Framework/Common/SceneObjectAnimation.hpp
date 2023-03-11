@@ -6,7 +6,7 @@
 #include "SceneObjectTrack.hpp"
 
 namespace ZetaEngine {
-    class SceneObjectAnimationClip : public BaseSceneObject, Animatable<float>
+    class SceneObjectAnimationClip : public BaseSceneObject, implements Animatable<float>
     {
         private:
             int m_nIndex = 0;

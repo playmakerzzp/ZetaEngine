@@ -1,23 +1,19 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
-#include <ostream>
-#include <stdint.h>
 #include "MemoryManager.hpp"
 
 using namespace ZetaEngine;
 using namespace std;
 
-namespace ZetaEngine
-{
+namespace ZetaEngine {
     std::ostream& operator<< (std::ostream& out, MemoryType type)
     {
         int32_t n = static_cast<int32_t>(type);
         n = endian_net_unsigned_int<int32_t>(n);
         char* c = reinterpret_cast<char*>(&n);
-
-        for (size_t i = 0; i < sizeof(int32_t); i++)
-        {
+         
+        for (size_t i = 0; i < sizeof(int32_t); i++) {
             out << *c++;
         }
 
@@ -49,12 +45,13 @@ void MemoryManager::Tick()
             cerr << info.second.PageSize;
         }
     }
-#endif    
+#endif
 }
 
 void* MemoryManager::AllocatePage(size_t size)
 {
     uint8_t* p;
+
     p = static_cast<uint8_t*>(malloc(size));
     if (p)
     {
@@ -65,7 +62,7 @@ void* MemoryManager::AllocatePage(size_t size)
     return static_cast<void*>(p);
 }
 
-void MemoryManager::FreePage(void *p)
+void MemoryManager::FreePage(void* p)
 {
     auto it = m_mapMemoryAllocationInfo.find(p);
     if (it != m_mapMemoryAllocationInfo.end())

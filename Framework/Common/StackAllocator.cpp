@@ -22,12 +22,12 @@ void* StackAllocator::Allocate(size_t size)
     return nullptr;
 }
 
-void StackAllocator::Free(void *p)
+void  StackAllocator::Free(void* p)
 {
 
 }
 
-void StackAllocator::FreeAll()
+void  StackAllocator::FreeAll()
 {
-    
+
 }
